@@ -1,0 +1,15 @@
+{
+  "user_id": "demo_user_003",
+  "user_face_image": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+  "template": "custom",
+  "prompt": "Create a dynamic product announcement video showcasing our new AI platform, with professional corporate styling and modern visual effects",
+  "duration": 20,
+  "quality": "maximum",
+  "resolution": "3840x2160",
+  "audio_enabled": true,
+  "custom_parameters": {
+    "background_color": "#1a1a1a",
+    "text_overlay": true,
+    "logo_position": "bottom-right"
+  }
+}

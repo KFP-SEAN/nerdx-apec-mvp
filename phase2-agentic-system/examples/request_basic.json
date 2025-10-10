@@ -1,0 +1,10 @@
+{
+  "user_id": "demo_user_001",
+  "user_face_image": "https://example.com/user-face.jpg",
+  "template": "sam_altman_apec",
+  "prompt": "Create a professional video of me discussing AI innovations and their impact on global trade at the APEC summit",
+  "duration": 15,
+  "quality": "high",
+  "resolution": "1920x1080",
+  "audio_enabled": true
+}

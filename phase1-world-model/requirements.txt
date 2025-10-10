@@ -1,0 +1,37 @@
+# Phase 1: World Model Dependencies
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Neo4j
+neo4j==5.16.0
+neomodel==5.2.1
+
+# Database
+redis==5.0.1
+asyncpg==0.29.0
+
+# AI/ML
+openai==1.10.0
+langchain==0.1.0
+langchain-openai==0.0.2
+tiktoken==0.5.2
+
+# Utilities
+python-dotenv==1.0.0
+httpx==0.26.0
+tenacity==8.2.3
+pydantic-settings==2.1.0
+
+# Logging & Monitoring
+python-json-logger==2.0.7
+prometheus-client==0.19.0
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+httpx==0.26.0

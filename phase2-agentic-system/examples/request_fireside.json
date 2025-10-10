@@ -1,0 +1,10 @@
+{
+  "user_id": "demo_user_002",
+  "user_face_image": "https://example.com/user-face-2.jpg",
+  "template": "sam_altman_fireside",
+  "prompt": "Have a casual fireside chat about the future of artificial intelligence, discussing both opportunities and challenges in an engaging, conversational way",
+  "duration": 30,
+  "quality": "high",
+  "resolution": "1920x1080",
+  "audio_enabled": true
+}
