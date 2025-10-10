@@ -9,7 +9,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckCircle, Package, Mail, Cube, ArrowRight, Download } from 'lucide-react';
+import { CheckCircle, Package, Mail, Box, ArrowRight, Download } from 'lucide-react';
 import Link from 'next/link';
 
 export default function OrderSuccessPage() {
@@ -111,7 +111,7 @@ export default function OrderSuccessPage() {
               {/* AR Access */}
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 mt-1">
-                  <Cube className="w-5 h-5 text-purple-600" />
+                  <Box className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">AR 체험 액세스</h3>
@@ -141,7 +141,7 @@ export default function OrderSuccessPage() {
           {/* AR Access Info (if applicable) */}
           <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 mb-6">
             <div className="flex items-start space-x-3">
-              <Cube className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
+              <Box className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
               <div>
                 <h3 className="font-bold text-purple-900 mb-2">
                   AR 체험 액세스 안내

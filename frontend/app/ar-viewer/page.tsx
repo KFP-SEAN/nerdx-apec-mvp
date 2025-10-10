@@ -9,7 +9,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Cube, Download, RotateCw, Maximize2, Info, AlertCircle } from 'lucide-react';
+import { Box, Download, RotateCw, Maximize2, Info, AlertCircle } from 'lucide-react';
 import Script from 'next/script';
 
 function ARViewerContent() {
@@ -121,7 +121,7 @@ function ARViewerContent() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Cube className="w-6 h-6 text-purple-400" />
+              <Box className="w-6 h-6 text-purple-400" />
               <div>
                 <h1 className="font-bold">AR 체험</h1>
                 {productInfo && (
@@ -169,7 +169,7 @@ function ARViewerContent() {
                 slot="ar-button"
                 className="absolute bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center space-x-2"
               >
-                <Cube className="w-5 h-5" />
+                <Box className="w-5 h-5" />
                 <span>AR로 보기</span>
               </button>
             </model-viewer>
@@ -206,7 +206,7 @@ function ARViewerContent() {
             {/* Device Requirements */}
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="font-bold mb-3 flex items-center">
-                <Cube className="w-5 h-5 mr-2 text-purple-400" />
+                <Box className="w-5 h-5 mr-2 text-purple-400" />
                 AR 지원 기기
               </h3>
               <div className="space-y-3 text-sm text-gray-300">

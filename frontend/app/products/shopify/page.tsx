@@ -33,6 +33,11 @@ export default function ShopifyProductsPage() {
       setError(null);
 
       const data = await shopifyService.getProducts();
+
+      // Debug: Log the result
+      console.log('Products fetched:', data);
+      console.log('Number of products:', data.length);
+
       setProducts(data);
     } catch (err) {
       console.error('Error loading products:', err);

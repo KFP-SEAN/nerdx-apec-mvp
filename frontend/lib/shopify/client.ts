@@ -1,7 +1,7 @@
 /**
  * Shopify Storefront API Client
  *
- * Provides type-safe access to Shopify products and checkout
+ * Provides type-safe access to Shopify products and checkout with metafields support
  */
 
 import Client from 'shopify-buy';
@@ -37,6 +37,113 @@ export interface ShopifyProduct {
   };
 }
 
+// GraphQL query for products with metafields
+const PRODUCTS_QUERY = `
+  query getProducts($first: Int!) {
+    products(first: $first) {
+      edges {
+        node {
+          id
+          handle
+          title
+          description
+          descriptionHtml
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          images(first: 10) {
+            edges {
+              node {
+                url
+                altText
+              }
+            }
+          }
+          variants(first: 10) {
+            edges {
+              node {
+                id
+                title
+                price {
+                  amount
+                  currencyCode
+                }
+                availableForSale
+              }
+            }
+          }
+          arEnabled: metafield(namespace: "custom", key: "ar_enabled") {
+            value
+          }
+          arAssetUrl: metafield(namespace: "custom", key: "ar_asset_url") {
+            value
+          }
+          apecLimited: metafield(namespace: "custom", key: "apec_limited") {
+            value
+          }
+          stockRemaining: metafield(namespace: "custom", key: "stock_remaining") {
+            value
+          }
+        }
+      }
+    }
+  }
+`;
+
+const PRODUCT_BY_HANDLE_QUERY = `
+  query getProductByHandle($handle: String!) {
+    productByHandle(handle: $handle) {
+      id
+      handle
+      title
+      description
+      descriptionHtml
+      priceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      images(first: 10) {
+        edges {
+          node {
+            url
+            altText
+          }
+        }
+      }
+      variants(first: 10) {
+        edges {
+          node {
+            id
+            title
+            price {
+              amount
+              currencyCode
+            }
+            availableForSale
+          }
+        }
+      }
+      arEnabled: metafield(namespace: "custom", key: "ar_enabled") {
+        value
+      }
+      arAssetUrl: metafield(namespace: "custom", key: "ar_asset_url") {
+        value
+      }
+      apecLimited: metafield(namespace: "custom", key: "apec_limited") {
+        value
+      }
+      stockRemaining: metafield(namespace: "custom", key: "stock_remaining") {
+        value
+      }
+    }
+  }
+`;
+
 export interface CheckoutLineItem {
   variantId: string;
   quantity: number;
@@ -63,6 +170,36 @@ const shopifyClient = Client.buildClient({
   apiVersion: '2024-01'
 });
 
+// GraphQL API configuration
+const SHOPIFY_GRAPHQL_URL = `https://${process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN}/api/2024-01/graphql.json`;
+const STOREFRONT_ACCESS_TOKEN = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN!;
+
+/**
+ * Fetch data from Shopify Storefront API using GraphQL
+ */
+async function shopifyFetch<T = any>(query: string, variables: Record<string, any> = {}): Promise<T> {
+  const response = await fetch(SHOPIFY_GRAPHQL_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': STOREFRONT_ACCESS_TOKEN,
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Shopify API error: ${response.statusText}`);
+  }
+
+  const json = await response.json();
+
+  if (json.errors) {
+    throw new Error(json.errors.map((e: any) => e.message).join(', '));
+  }
+
+  return json.data;
+}
+
 /**
  * Shopify Service Class
  */
@@ -82,10 +219,12 @@ export class ShopifyService {
     query?: string;
   }): Promise<ShopifyProduct[]> {
     try {
-      const products = await this.client.product.fetchAll();
+      const data = await shopifyFetch(PRODUCTS_QUERY, {
+        first: options?.first || 50
+      });
 
-      // Transform to our type
-      return products.map(this.transformProduct);
+      // Transform GraphQL response to our type
+      return data.products.edges.map((edge: any) => this.transformGraphQLProduct(edge.node));
     } catch (error) {
       console.error('Error fetching products:', error);
       throw error;
@@ -97,11 +236,11 @@ export class ShopifyService {
    */
   async getProductByHandle(handle: string): Promise<ShopifyProduct | null> {
     try {
-      const product = await this.client.product.fetchByHandle(handle);
+      const data = await shopifyFetch(PRODUCT_BY_HANDLE_QUERY, { handle });
 
-      if (!product) return null;
+      if (!data.productByHandle) return null;
 
-      return this.transformProduct(product);
+      return this.transformGraphQLProduct(data.productByHandle);
     } catch (error) {
       console.error(`Error fetching product ${handle}:`, error);
       throw error;
@@ -235,7 +374,49 @@ export class ShopifyService {
   }
 
   /**
-   * Transform Shopify product to our type
+   * Transform GraphQL product response to our type
+   */
+  private transformGraphQLProduct(product: any): ShopifyProduct {
+    // Extract metafields from GraphQL response
+    const metafields: any = {};
+
+    // Parse metafield values
+    if (product.arEnabled?.value !== undefined) {
+      metafields.arEnabled = product.arEnabled.value === 'true';
+    }
+    if (product.arAssetUrl?.value) {
+      metafields.arAssetUrl = product.arAssetUrl.value;
+    }
+    if (product.apecLimited?.value !== undefined) {
+      metafields.apecLimited = product.apecLimited.value === 'true';
+    }
+    if (product.stockRemaining?.value !== undefined) {
+      metafields.stockRemaining = parseInt(product.stockRemaining.value, 10);
+    }
+
+    return {
+      id: product.id,
+      handle: product.handle,
+      title: product.title,
+      description: product.description,
+      descriptionHtml: product.descriptionHtml,
+      priceRange: product.priceRange,
+      images: product.images.edges.map((edge: any) => ({
+        url: edge.node.url,
+        altText: edge.node.altText
+      })),
+      variants: product.variants.edges.map((edge: any) => ({
+        id: edge.node.id,
+        title: edge.node.title,
+        price: edge.node.price.amount,
+        available: edge.node.availableForSale
+      })),
+      metafields
+    };
+  }
+
+  /**
+   * Transform Shopify product to our type (for Buy SDK - legacy)
    */
   private transformProduct(product: any): ShopifyProduct {
     // Extract metafields if available

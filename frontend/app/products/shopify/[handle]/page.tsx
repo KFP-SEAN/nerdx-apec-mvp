@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 import { shopifyService, ShopifyProduct } from '@/lib/shopify/client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, Cube, ShoppingCart, CreditCard, Package, Info } from 'lucide-react';
+import { ArrowLeft, Box, ShoppingCart, CreditCard, Package, Info } from 'lucide-react';
 
 interface ProductDetailPageProps {
   params: {
@@ -241,7 +241,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 onClick={openARPreview}
                 className="w-full mt-4 px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center justify-center space-x-2"
               >
-                <Cube className="w-5 h-5" />
+                <Box className="w-5 h-5" />
                 <span className="font-semibold">AR로 미리보기</span>
               </button>
             )}
@@ -382,7 +382,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 <div className="border-t mt-6 pt-6">
                   <div className="bg-purple-50 rounded-lg p-4">
                     <h3 className="font-bold text-purple-900 mb-2 flex items-center">
-                      <Cube className="w-5 h-5 mr-2" />
+                      <Box className="w-5 h-5 mr-2" />
                       AR 체험 안내
                     </h3>
                     <p className="text-sm text-purple-800">
