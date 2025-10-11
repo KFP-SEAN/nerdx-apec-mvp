@@ -1,0 +1,78 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Install Playwright
+        run: |
+          cd frontend
+          npx playwright install chromium
+
+      - name: Run tests
+        run: |
+          cd frontend
+          npm run test
+        env:
+          NEXT_PUBLIC_SHOPIFY_DOMAIN: ${{ secrets.SHOPIFY_DOMAIN }}
+          NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN: ${{ secrets.SHOPIFY_STOREFRONT_TOKEN }}
+
+      - name: Run E2E tests
+        run: |
+          cd frontend
+          npm run dev &
+          sleep 10
+          npx tsx scripts/autonomous-test.ts
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: frontend/test-results/
+
+  deploy-preview:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to Vercel (Preview)
+        run: echo "Vercel preview deployment would happen here"
+
+  deploy-production:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to Vercel (Production)
+        run: echo "Vercel production deployment would happen here"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

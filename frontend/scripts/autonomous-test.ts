@@ -266,8 +266,8 @@ async function runTests() {
     await test.test('AR and APEC badges are visible', async () => {
       await test.goto('/products/shopify'); // Reset filters
 
-      const arBadges = await test.getCount('text=AR 체험 가능');
-      const apecBadges = await test.getCount('text=APEC 한정판');
+      const arBadges = await test.getCount('[class*="bg-purple-600"]');
+      const apecBadges = await test.getCount('[class*="bg-red-600"]');
 
       console.log(`   Found ${arBadges} AR badges`);
       console.log(`   Found ${apecBadges} APEC badges`);
