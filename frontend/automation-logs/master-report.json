@@ -1,0 +1,20 @@
+{
+  "startTime": 1760147762941,
+  "endTime": 1760147767169,
+  "totalDuration": 4214,
+  "results": [
+    {
+      "phase": "Phase A: Shopify Integration",
+      "status": "failed",
+      "duration": 4198,
+      "error": "Command failed: npx tsx scripts/phase-a-shopify.ts\n[Phase A] Fatal Error: ReferenceError: item is not defined\n    at PhaseAShopify.generateShoppingCart (C:\\Users\\seans\\nerdx-apec-mvp\\frontend\\scripts\\phase-a-shopify.ts:370:48)\n    at PhaseAShopify.run (C:\\Users\\seans\\nerdx-apec-mvp\\frontend\\scripts\\phase-a-shopify.ts:27:16)\n",
+      "logs": []
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "successful": 0,
+    "failed": 1,
+    "skipped": 0
+  }
+}
