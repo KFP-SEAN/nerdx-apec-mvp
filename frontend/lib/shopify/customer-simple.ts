@@ -104,7 +104,7 @@ export async function signUp(input: SignUpInput): Promise<Customer> {
       throw new ValidationError('Please enter a valid email address');
     }
 
-    // Check if email already exists
+    // Check if email already exists in localStorage
     const customers = getStoredCustomers();
     const emailLower = input.email.toLowerCase();
 
@@ -112,10 +112,43 @@ export async function signUp(input: SignUpInput): Promise<Customer> {
       throw new ValidationError('An account with this email already exists');
     }
 
-    // Create customer
-    const customerId = generateCustomerId();
+    // Create customer in Shopify via API
+    let shopifyCustomerId = generateCustomerId();
+    try {
+      const response = await fetch('/api/customer/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: emailLower,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          phone: input.phone,
+          acceptsMarketing: input.acceptsMarketing || false,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        shopifyCustomerId = data.customer.id;
+        console.log('Customer created in Shopify:', shopifyCustomerId);
+      } else {
+        if (data.alreadyExists) {
+          throw new ValidationError('An account with this email already exists');
+        }
+        console.warn('Failed to create customer in Shopify:', data.message);
+        // Continue with localStorage-only registration
+      }
+    } catch (error: any) {
+      console.warn('Shopify API error, continuing with local storage:', error);
+      // Continue with localStorage-only registration
+    }
+
+    // Create customer locally
     const customer: Customer = {
-      id: customerId,
+      id: shopifyCustomerId,
       email: emailLower,
       firstName: input.firstName,
       lastName: input.lastName,
@@ -123,7 +156,7 @@ export async function signUp(input: SignUpInput): Promise<Customer> {
       acceptsMarketing: input.acceptsMarketing || false,
     };
 
-    // Store customer
+    // Store customer in localStorage
     customers[emailLower] = {
       ...customer,
       passwordHash: hashPassword(input.password),
@@ -131,12 +164,9 @@ export async function signUp(input: SignUpInput): Promise<Customer> {
     };
     setStoredCustomers(customers);
 
-    // Log for tracking
-    console.log('Customer created:', {
-      id: customerId,
+    console.log('Customer created locally:', {
+      id: customer.id,
       email: emailLower,
-      firstName: input.firstName,
-      lastName: input.lastName,
     });
 
     // Auto sign in after signup
