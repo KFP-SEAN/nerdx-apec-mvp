@@ -367,7 +367,7 @@ export default function CartPage() {
               {/* Product Info */}
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">{item.product.title}</h3>
-                <p className="text-gray-600">${item.product.price}</p>
+                <p className="text-gray-600">\${item.product.price}</p>
               </div>
 
               {/* Quantity Control */}
@@ -390,7 +390,7 @@ export default function CartPage() {
               {/* Subtotal */}
               <div className="text-right">
                 <p className="font-semibold text-lg">
-                  ${(parseFloat(item.product.price) * item.quantity).toFixed(2)}
+                  \${(parseFloat(item.product.price) * item.quantity).toFixed(2)}
                 </p>
               </div>
 
@@ -421,7 +421,7 @@ export default function CartPage() {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">소계</span>
-                <span className="font-semibold">${total.toFixed(2)}</span>
+                <span className="font-semibold">\${total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">배송비</span>
@@ -429,7 +429,7 @@ export default function CartPage() {
               </div>
               <div className="border-t pt-2 flex justify-between">
                 <span className="text-lg font-bold">총계</span>
-                <span className="text-lg font-bold text-blue-600">${total.toFixed(2)}</span>
+                <span className="text-lg font-bold text-blue-600">\${total.toFixed(2)}</span>
               </div>
             </div>
 
