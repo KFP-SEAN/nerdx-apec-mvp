@@ -203,7 +203,7 @@ export default function ProductDetailPage({ params }: { params: { handle: string
 
           <div className="mb-6">
             <span className="text-4xl font-bold text-blue-600">
-              ${product.variants[selectedVariant].price}
+              \${product.variants[selectedVariant].price}
             </span>
             <span className="text-gray-500 ml-2">KRW</span>
           </div>
@@ -228,7 +228,7 @@ export default function ProductDetailPage({ params }: { params: { handle: string
               >
                 {product.variants.map((variant, index) => (
                   <option key={variant.id} value={index}>
-                    {variant.title} - ${variant.price}
+                    {variant.title} - \${variant.price}
                   </option>
                 ))}
               </select>
