@@ -1,18 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm run build",
-  "devCommand": "cd frontend && npm run dev",
-  "installCommand": "cd frontend && npm install",
-  "framework": "nextjs",
-  "outputDirectory": "frontend/.next",
-  "env": {
-    "NEXT_PUBLIC_SHOPIFY_DOMAIN": "@shopify_domain",
-    "NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN": "@shopify_storefront_token"
-  },
-  "build": {
-    "env": {
-      "NEXT_PUBLIC_SHOPIFY_DOMAIN": "@shopify_domain",
-      "NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN": "@shopify_storefront_token"
-    }
-  }
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs"
 }
