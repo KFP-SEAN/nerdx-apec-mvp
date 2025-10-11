@@ -40,7 +40,8 @@ class PhaseECustomApp {
       '../backend/src/database',
       '../backend/src/cache',
       '../backend/src/services',
-      '../backend/src/middleware'
+      '../backend/src/middleware',
+      '../backend/docs'
     ];
 
     dirs.forEach(dir => {
