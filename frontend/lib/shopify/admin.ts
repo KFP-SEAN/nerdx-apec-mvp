@@ -77,7 +77,10 @@ export async function createShopifyCustomer(input: {
           firstName
           lastName
           phone
-          acceptsMarketing
+          emailMarketingConsent {
+            marketingState
+            consentUpdatedAt
+          }
           tags
         }
         userErrors {
@@ -94,7 +97,12 @@ export async function createShopifyCustomer(input: {
       firstName: input.firstName,
       lastName: input.lastName,
       phone: input.phone || null,
-      acceptsMarketing: input.acceptsMarketing || false,
+      emailMarketingConsent: input.acceptsMarketing
+        ? {
+            marketingState: 'SUBSCRIBED',
+            marketingOptInLevel: 'SINGLE_OPT_IN',
+          }
+        : undefined,
       tags: input.tags || [],
     },
   };
@@ -126,7 +134,10 @@ export async function updateCustomerMarketing(
       customerUpdate(input: $input) {
         customer {
           id
-          acceptsMarketing
+          emailMarketingConsent {
+            marketingState
+            consentUpdatedAt
+          }
         }
         userErrors {
           field
@@ -139,7 +150,10 @@ export async function updateCustomerMarketing(
   const variables = {
     input: {
       id: customerId,
-      acceptsMarketing,
+      emailMarketingConsent: {
+        marketingState: acceptsMarketing ? 'SUBSCRIBED' : 'UNSUBSCRIBED',
+        marketingOptInLevel: 'SINGLE_OPT_IN',
+      },
     },
   };
 
@@ -208,7 +222,10 @@ export async function findCustomerByEmail(email: string) {
             firstName
             lastName
             phone
-            acceptsMarketing
+            emailMarketingConsent {
+              marketingState
+              consentUpdatedAt
+            }
             tags
           }
         }
