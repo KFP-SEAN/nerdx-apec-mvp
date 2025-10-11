@@ -29,6 +29,7 @@ export interface ShopifyProduct {
     price: string;
     available: boolean;
   }>;
+  tags?: string[];
   metafields?: {
     arEnabled?: boolean;
     arAssetUrl?: string;
@@ -101,6 +102,7 @@ const PRODUCT_BY_HANDLE_QUERY = `
       title
       description
       descriptionHtml
+      tags
       priceRange {
         minVariantPrice {
           amount
@@ -199,6 +201,37 @@ async function shopifyFetch<T = any>(query: string, variables: Record<string, an
 
   return json.data;
 }
+
+/**
+ * Fetch data from Shopify Admin API using GraphQL
+ */
+export async function shopifyAdminFetch<T = any>(query: string, variables: Record<string, any> = {}): Promise<T> {
+  const ADMIN_API_URL = `https://${process.env.NEXT_PUBLIC_SHOPIFY_DOMAIN}/admin/api/2024-01/graphql.json`;
+
+  const response = await fetch(ADMIN_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Access-Token': process.env.SHOPIFY_ADMIN_API_TOKEN!,
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Shopify Admin API error: ${response.statusText}`);
+  }
+
+  const json = await response.json();
+
+  if (json.errors) {
+    throw new Error(json.errors.map((e: any) => e.message).join(', '));
+  }
+
+  return json.data;
+}
+
+// Export the storefront fetch function
+export { shopifyFetch as shopifyStorefrontFetch };
 
 /**
  * Shopify Service Class
@@ -411,6 +444,7 @@ export class ShopifyService {
         price: edge.node.price.amount,
         available: edge.node.availableForSale
       })),
+      tags: product.tags || [],
       metafields
     };
   }

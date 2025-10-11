@@ -5,10 +5,10 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function EnhancedARViewerPage() {
+function ARViewerContent() {
   const searchParams = useSearchParams();
   const product = searchParams.get('product');
   const modelViewerRef = useRef<any>(null);
@@ -103,5 +103,17 @@ export default function EnhancedARViewerPage() {
         </model-viewer>
       </div>
     </div>
+  );
+}
+
+export default function EnhancedARViewerPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-xl">Loading AR Viewer...</div>
+      </div>
+    }>
+      <ARViewerContent />
+    </Suspense>
   );
 }

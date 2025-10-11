@@ -1,0 +1,13 @@
+
+# Environment files with secrets
+frontend/.env.vercel
+frontend/check-shopify-customer.js
+frontend/list-recent-subscribers.js
+frontend/*test*.js
+frontend/*test*.png
+frontend/diagnose*.js
+frontend/debug*.js
+frontend/simple*.js
+frontend/quick*.js
+frontend/verify*.js
+frontend/update-env.sh

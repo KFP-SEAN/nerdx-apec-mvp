@@ -4,6 +4,9 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import NewsletterPopup from '@/components/NewsletterPopup';
+import { CartProvider } from '@/context/CartContext';
+import ClientInitializer from '@/components/ClientInitializer';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -50,37 +53,41 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <div className="flex flex-col min-h-screen">
-          <Navigation />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <Footer />
-        </div>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: '#10b981',
-                secondary: '#fff',
+        <CartProvider>
+          <ClientInitializer />
+          <div className="flex flex-col min-h-screen">
+            <Navigation />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </div>
+          <NewsletterPopup />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
               },
-            },
-            error: {
-              duration: 5000,
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
               },
-            },
-          }}
-        />
+              error: {
+                duration: 5000,
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+        </CartProvider>
       </body>
     </html>
   );

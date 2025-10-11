@@ -11,7 +11,7 @@ import time
 
 from config import settings
 from services.neo4j_service import get_neo4j_service
-from routers import products, chat, users, recommendations
+from routers import products, chat, users, recommendations, webhooks, analytics, content_studio
 from models.api_models import HealthCheckResponse, ErrorResponse
 
 # Logging setup
@@ -101,6 +101,9 @@ app.include_router(products.router, prefix="/api/v1/products", tags=["Products"]
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(recommendations.router, prefix="/api/v1/recommendations", tags=["Recommendations"])
+app.include_router(webhooks.router, prefix="/api/v1/webhooks", tags=["Webhooks"])
+app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
+app.include_router(content_studio.router, prefix="/api/v1/studio", tags=["Content Studio"])
 
 
 # Root endpoints
@@ -108,8 +111,21 @@ app.include_router(recommendations.router, prefix="/api/v1/recommendations", tag
 async def root():
     """Root endpoint"""
     return {
-        "message": "NERDX APEC MVP - Phase 1: World Model API",
-        "version": "1.0.0",
+        "message": "NERDX APEC MVP - Phase 2: WORLD MODEL (Complete Intelligence Platform)",
+        "version": "2.2.0",
+        "phase": "Phase 2D: Content Studio",
+        "features": [
+            "AI Orchestration (Claude + Gemini + Maeju)",
+            "Shopify Bidirectional Sync",
+            "Real-time Webhooks",
+            "Closed-Loop Analytics",
+            "Sentiment Analysis (UGC)",
+            "Trend Tracking (External)",
+            "Unified Analytics Engine",
+            "Content Studio (AI Content Generation)",
+            "Video Script Generation (Sora-style)",
+            "Content Atomization (Turkey Slice)"
+        ],
         "docs": "/docs",
         "health": "/health"
     }

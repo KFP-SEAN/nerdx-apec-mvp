@@ -167,3 +167,10 @@ class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+class WebhookResponse(BaseModel):
+    """Shopify webhook response"""
+    success: bool
+    message: str
+    webhook_id: Optional[str] = None

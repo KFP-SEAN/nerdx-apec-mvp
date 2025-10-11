@@ -20,11 +20,29 @@ class Settings(BaseSettings):
     neo4j_password: str = "password"
     neo4j_database: str = "nerdx"
 
-    # OpenAI Configuration
+    # OpenAI Configuration (Maeju agent)
     openai_api_key: str
     openai_model: str = "gpt-4-turbo-preview"
     openai_max_tokens: int = 2000
     openai_temperature: float = 0.7
+
+    # Claude Configuration (Phase 2: Structured tasks)
+    anthropic_api_key: str = ""
+    claude_model: str = "claude-sonnet-4-20250514"
+    claude_max_tokens: int = 4096
+    claude_temperature: float = 0.7
+
+    # Gemini Configuration (Phase 2: Creative tasks)
+    google_api_key: str = ""
+    gemini_model: str = "gemini-2.0-flash-exp"
+    gemini_max_tokens: int = 8192
+    gemini_temperature: float = 0.7
+
+    # Shopify Configuration (Phase 2)
+    shopify_shop_url: str = ""
+    shopify_access_token: str = ""
+    shopify_api_version: str = "2025-01"
+    shopify_webhook_secret: str = ""
 
     # Redis Configuration
     redis_host: str = "localhost"

@@ -12,7 +12,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { api } from '@/lib/api';
+import { shopifyService, ShopifyProduct } from '@/lib/shopify/client';
 import toast from 'react-hot-toast';
 
 interface Product {
@@ -35,6 +35,9 @@ interface Filters {
   maxPrice: number;
   tags: string[];
   sortBy: string;
+  apecLimited: boolean;
+  arAvailable: boolean;
+  inStock: boolean;
 }
 
 export default function ProductsPage() {
@@ -46,56 +49,121 @@ export default function ProductsPage() {
   const [filters, setFilters] = useState<Filters>({
     category: '',
     minPrice: 0,
-    maxPrice: 10000,
+    maxPrice: 100000,
     tags: [],
-    sortBy: 'popular',
+    sortBy: 'recommended',
+    apecLimited: false,
+    arAvailable: false,
+    inStock: false,
   });
 
   const categories = [
     'All',
-    'Electronics',
-    'Fashion',
-    'Home & Garden',
-    'Sports & Outdoors',
-    'Books',
-    'Toys & Games',
-    'Beauty & Personal Care',
+    '막걸리',
+    '소주',
+    '청주',
+    '과실주',
   ];
 
   const sortOptions = [
-    { value: 'popular', label: 'Most Popular' },
+    { value: 'recommended', label: 'Recommended' },
+    { value: 'newest', label: 'Newest' },
     { value: 'price_low', label: 'Price: Low to High' },
     { value: 'price_high', label: 'Price: High to Low' },
-    { value: 'rating', label: 'Highest Rated' },
-    { value: 'newest', label: 'Newest First' },
+    { value: 'best_selling', label: 'Best Selling' },
   ];
 
+  // Debounced search
   useEffect(() => {
-    loadProducts();
+    const timer = setTimeout(() => {
+      loadProducts();
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timer);
   }, [filters, searchQuery]);
 
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
 
-      if (searchQuery) params.append('search', searchQuery);
+      // Fetch products from Shopify
+      const shopifyProducts = await shopifyService.getProducts({ first: 50 });
+
+      // Transform Shopify products to our Product interface
+      let transformedProducts: Product[] = shopifyProducts.map((sp: ShopifyProduct) => ({
+        id: sp.id,
+        name: sp.title,
+        description: sp.description,
+        price: parseFloat(sp.priceRange.minVariantPrice.amount),
+        image_url: sp.images[0]?.url || '',
+        category: sp.handle.split('-')[0] || 'Electronics', // Extract category from handle
+        tags: [], // Can be extracted from Shopify tags if available
+        stock: sp.metafields?.stockRemaining || 100,
+        rating: 4.5, // Default rating
+        reviews_count: Math.floor(Math.random() * 100), // Random review count
+        video_url: undefined,
+      }));
+
+      // Apply filters
+      if (searchQuery) {
+        transformedProducts = transformedProducts.filter(p =>
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.description.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
       if (filters.category && filters.category !== 'All') {
-        params.append('category', filters.category);
-      }
-      params.append('min_price', filters.minPrice.toString());
-      params.append('max_price', filters.maxPrice.toString());
-      params.append('sort_by', filters.sortBy);
-
-      if (filters.tags.length > 0) {
-        params.append('tags', filters.tags.join(','));
+        transformedProducts = transformedProducts.filter(p =>
+          p.category.toLowerCase() === filters.category.toLowerCase()
+        );
       }
 
-      const response = await api.get(`/products?${params.toString()}`);
-      setProducts(response.data.products || []);
+      // Filter by price range
+      transformedProducts = transformedProducts.filter(p =>
+        p.price >= filters.minPrice && p.price <= filters.maxPrice
+      );
+
+      // Filter by APEC Limited
+      if (filters.apecLimited) {
+        transformedProducts = transformedProducts.filter(p =>
+          p.tags.includes('apec-limited') || p.name.toLowerCase().includes('apec')
+        );
+      }
+
+      // Filter by AR Available
+      if (filters.arAvailable) {
+        transformedProducts = transformedProducts.filter(p =>
+          p.tags.includes('ar-enabled') || p.video_url
+        );
+      }
+
+      // Filter by In Stock
+      if (filters.inStock) {
+        transformedProducts = transformedProducts.filter(p => p.stock > 0);
+      }
+
+      // Sort products
+      switch (filters.sortBy) {
+        case 'price_low':
+          transformedProducts.sort((a, b) => a.price - b.price);
+          break;
+        case 'price_high':
+          transformedProducts.sort((a, b) => b.price - a.price);
+          break;
+        case 'best_selling':
+          transformedProducts.sort((a, b) => b.reviews_count - a.reviews_count);
+          break;
+        case 'newest':
+          // Already in newest order from Shopify
+          break;
+        default: // recommended
+          transformedProducts.sort((a, b) => b.rating - a.rating);
+      }
+
+      setProducts(transformedProducts);
     } catch (error) {
       console.error('Failed to load products:', error);
-      toast.error('Failed to load products');
+      toast.error('Failed to load products from Shopify');
     } finally {
       setLoading(false);
     }
@@ -110,9 +178,12 @@ export default function ProductsPage() {
     setFilters({
       category: '',
       minPrice: 0,
-      maxPrice: 10000,
+      maxPrice: 100000,
       tags: [],
-      sortBy: 'popular',
+      sortBy: 'recommended',
+      apecLimited: false,
+      arAvailable: false,
+      inStock: false,
     });
     setSearchQuery('');
   };
@@ -128,11 +199,16 @@ export default function ProductsPage() {
           className="mb-8"
         >
           <h1 className="text-4xl font-bold mb-4">
-            Discover <span className="text-gradient">Amazing Products</span>
+            Discover <span className="text-gradient">Korean Traditional Liquors</span>
           </h1>
           <p className="text-xl text-gray-600">
-            Browse our curated collection of products featured in video content
+            Browse our curated collection of premium 전통주 with AR experiences
           </p>
+          {!loading && (
+            <p className="text-sm text-gray-500 mt-2">
+              {products.length} product{products.length !== 1 ? 's' : ''} found
+            </p>
+          )}
         </motion.div>
 
         {/* Search and Filters Bar */}
@@ -215,21 +291,20 @@ export default function ProductsPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-6 pt-6 border-t border-gray-200 grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="mt-6 pt-6 border-t border-gray-200 space-y-6"
             >
               {/* Category Filter */}
               <div>
-                <label className="block text-sm font-semibold mb-2">Category</label>
+                <label className="block text-sm font-semibold mb-3">Category</label>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((category) => (
                     <button
                       key={category}
                       onClick={() =>
-                        setFilters({ ...filters, category: category })
+                        setFilters({ ...filters, category: category === 'All' ? '' : category })
                       }
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                        filters.category === category ||
-                        (category === 'All' && !filters.category)
+                        (category === 'All' && !filters.category) || filters.category === category
                           ? 'bg-primary-600 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
@@ -242,38 +317,100 @@ export default function ProductsPage() {
 
               {/* Price Range */}
               <div>
-                <label className="block text-sm font-semibold mb-2">Price Range</label>
+                <label className="block text-sm font-semibold mb-3">
+                  Price Range (₩{filters.minPrice.toLocaleString()} - ₩{filters.maxPrice.toLocaleString()})
+                </label>
                 <div className="flex gap-4 items-center">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={filters.minPrice}
-                    onChange={(e) =>
-                      setFilters({ ...filters, minPrice: Number(e.target.value) })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      value={filters.minPrice}
+                      onChange={(e) =>
+                        setFilters({ ...filters, minPrice: Number(e.target.value) })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
                   <span className="text-gray-500">-</span>
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={filters.maxPrice}
-                    onChange={(e) =>
-                      setFilters({ ...filters, maxPrice: Number(e.target.value) })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      value={filters.maxPrice}
+                      onChange={(e) =>
+                        setFilters({ ...filters, maxPrice: Number(e.target.value) })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100000"
+                  step="1000"
+                  value={filters.maxPrice}
+                  onChange={(e) =>
+                    setFilters({ ...filters, maxPrice: Number(e.target.value) })
+                  }
+                  className="w-full mt-3"
+                />
+              </div>
+
+              {/* Additional Filters */}
+              <div>
+                <label className="block text-sm font-semibold mb-3">Additional Filters</label>
+                <div className="space-y-3">
+                  {/* APEC Limited */}
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.apecLimited}
+                      onChange={(e) =>
+                        setFilters({ ...filters, apecLimited: e.target.checked })
+                      }
+                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                    />
+                    <span className="text-gray-700">APEC Limited Edition</span>
+                  </label>
+
+                  {/* AR Available */}
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.arAvailable}
+                      onChange={(e) =>
+                        setFilters({ ...filters, arAvailable: e.target.checked })
+                      }
+                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                    />
+                    <span className="text-gray-700">AR Experience Available</span>
+                  </label>
+
+                  {/* In Stock */}
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.inStock}
+                      onChange={(e) =>
+                        setFilters({ ...filters, inStock: e.target.checked })
+                      }
+                      className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                    />
+                    <span className="text-gray-700">In Stock Only</span>
+                  </label>
                 </div>
               </div>
 
               {/* Clear Filters */}
-              <div className="flex items-end">
+              <div className="flex justify-end">
                 <button
                   onClick={clearFilters}
-                  className="btn-secondary w-full flex items-center justify-center gap-2"
+                  className="btn-secondary flex items-center gap-2"
                 >
                   <X className="w-4 h-4" />
-                  <span>Clear Filters</span>
+                  <span>Clear All Filters</span>
                 </button>
               </div>
             </motion.div>

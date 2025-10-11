@@ -215,6 +215,84 @@ class Interaction(StructuredNode):
     metadata = JSONProperty()
 
 
+# ============================================================================
+# Phase 2B: Shopify Integration Nodes
+# ============================================================================
+
+class Purchase(StructuredNode):
+    """Purchase/Order from Shopify (Phase 2B)"""
+
+    uid = UniqueIdProperty()
+    purchase_id = StringProperty(unique_index=True, required=True)
+    shopify_order_id = StringProperty(index=True)
+    order_number = IntegerProperty()
+
+    # Financial details
+    total_amount = FloatProperty(required=True)
+    subtotal_amount = FloatProperty()
+    tax_amount = FloatProperty()
+    currency = StringProperty(default="USD")
+
+    # Status
+    financial_status = StringProperty()  # paid, pending, refunded
+    fulfillment_status = StringProperty()  # fulfilled, partial, unfulfilled
+    status = StringProperty(default="completed")  # completed, cancelled, refunded
+
+    # Timestamps
+    timestamp = DateTimeProperty(default_now=True)
+    processed_at = DateTimeProperty()
+    cancelled_at = DateTimeProperty()
+
+    # Metadata
+    metadata = JSONProperty()
+
+    # Relationships
+    made_by = RelationshipFrom('User', 'MADE_PURCHASE')
+    contains = RelationshipTo('Product', 'CONTAINS')
+    attributed_to = RelationshipFrom('Content', 'ATTRIBUTED_TO')
+
+
+class Content(StructuredNode):
+    """Content pieces (blog, video, social) - Phase 2B"""
+
+    uid = UniqueIdProperty()
+    content_id = StringProperty(unique_index=True, required=True)
+    title = StringProperty(required=True)
+    content_type = StringProperty(required=True)  # video, blog, social, lore
+
+    # URLs and identifiers
+    url = StringProperty()
+    external_id = StringProperty()  # YouTube ID, Instagram post ID, etc.
+
+    # Creator
+    creator_id = StringProperty()
+    creator_name = StringProperty()
+
+    # Engagement metrics
+    views = IntegerProperty(default=0)
+    likes = IntegerProperty(default=0)
+    shares = IntegerProperty(default=0)
+    comments_count = IntegerProperty(default=0)
+    engagement_score = FloatProperty(default=0.0)
+
+    # Conversion metrics (closed-loop!)
+    impressions = IntegerProperty(default=0)
+    clicks = IntegerProperty(default=0)
+    conversions = IntegerProperty(default=0)
+    conversion_rate = FloatProperty(default=0.0)
+    attributed_revenue = FloatProperty(default=0.0)
+
+    # Timestamps
+    created_at = DateTimeProperty(default_now=True)
+    published_at = DateTimeProperty()
+    last_updated = DateTimeProperty()
+
+    # Relationships
+    features = RelationshipTo('Product', 'FEATURES')
+    viewed_by = RelationshipFrom('User', 'VIEWED')
+    attributed_purchases = RelationshipTo('Purchase', 'ATTRIBUTED_TO')
+
+
 # Utility functions for common queries
 
 def get_product_recommendations(user_id: str, limit: int = 5):

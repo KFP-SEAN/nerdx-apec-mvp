@@ -1,37 +1,41 @@
-# Phase 1: World Model Dependencies
+# NERDX World Model - Phase 2 Requirements
 
-# Web Framework
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-pydantic==2.5.3
-pydantic-settings==2.1.0
-
-# Neo4j
-neo4j==5.16.0
-neomodel==5.2.1
+# Core Framework
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+pydantic==2.7.4
+pydantic-settings==2.3.3
 
 # Database
-redis==5.0.1
-asyncpg==0.29.0
+neo4j==5.20.0
+neomodel==5.3.1
+redis==5.0.5
 
-# AI/ML
-openai==1.10.0
-langchain==0.1.0
-langchain-openai==0.0.2
-tiktoken==0.5.2
+# AI/ML - Phase 1 (OpenAI for Maeju)
+openai==1.35.0
 
-# Utilities
-python-dotenv==1.0.0
-httpx==0.26.0
-tenacity==8.2.3
-pydantic-settings==2.1.0
+# AI/ML - Phase 2A (Polyglot AI)
+anthropic==0.28.0
+google-generativeai==0.6.0
 
-# Logging & Monitoring
-python-json-logger==2.0.7
-prometheus-client==0.19.0
+# Shopify Integration - Phase 2B
+shopify-python-api==12.5.0
+graphql-core==3.2.3
+
+# Data Processing
+pandas==2.2.2
+numpy==1.26.4
 
 # Testing
-pytest==7.4.4
-pytest-asyncio==0.23.3
-pytest-cov==4.1.0
-httpx==0.26.0
+pytest==8.2.2
+pytest-asyncio==0.23.7
+httpx==0.27.0
+
+# Monitoring
+prometheus-client==0.20.0
+
+# Utilities
+python-multipart==0.0.9
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.1

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
@@ -11,51 +10,13 @@ import {
   Sparkles,
   ArrowRight,
   Eye,
-  Heart,
   Share2,
 } from 'lucide-react';
-import VideoPlayer from '@/components/VideoPlayer';
-import ProductCarousel from '@/components/ProductCarousel';
-import { api } from '@/lib/api';
-import toast from 'react-hot-toast';
-
-interface VideoData {
-  id: string;
-  title: string;
-  description: string;
-  video_url: string;
-  thumbnail_url: string;
-  views: number;
-  likes: number;
-  products: Array<{
-    id: string;
-    name: string;
-    price: number;
-    image_url: string;
-  }>;
-}
 
 export default function HomePage() {
-  const [featuredVideo, setFeaturedVideo] = useState<VideoData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    loadFeaturedVideo();
-  }, []);
-
-  const loadFeaturedVideo = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/videos/featured');
-      setFeaturedVideo(response.data);
-    } catch (error) {
-      console.error('Failed to load featured video:', error);
-      toast.error('Failed to load featured video');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Using hardcoded Google Drive video
+  const GOOGLE_DRIVE_VIDEO_ID = '19lUs8oMOtY8Ah3vUp37X7R7J0jcb811k';
+  const videoEmbedUrl = `https://drive.google.com/file/d/${GOOGLE_DRIVE_VIDEO_ID}/preview`;
 
   return (
     <div className="min-h-screen gradient-bg">
@@ -127,73 +88,41 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative"
           >
-            {loading ? (
-              <div className="video-container bg-gray-200 skeleton" />
-            ) : featuredVideo ? (
-              <div className="space-y-4">
-                <VideoPlayer
-                  videoUrl={featuredVideo.video_url}
-                  thumbnailUrl={featuredVideo.thumbnail_url}
-                  title={featuredVideo.title}
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
+            <div className="space-y-4">
+              {/* Google Drive Video Embed */}
+              <div className="video-container relative overflow-hidden rounded-2xl shadow-xl">
+                <iframe
+                  src={videoEmbedUrl}
+                  className="w-full h-full absolute inset-0"
+                  allow="autoplay"
+                  allowFullScreen
+                  title="Featured Video"
                 />
+              </div>
 
-                {/* Video Info */}
-                <div className="card">
-                  <h3 className="text-xl font-bold mb-2">{featuredVideo.title}</h3>
-                  <p className="text-gray-600 mb-4">{featuredVideo.description}</p>
+              {/* Video Info */}
+              <div className="card">
+                <h3 className="text-xl font-bold mb-2">Sam Altman's Product Showcase</h3>
+                <p className="text-gray-600 mb-4">
+                  Watch as Sam Altman introduces the latest innovative products.
+                  Discover cutting-edge technology and shop directly from the video.
+                </p>
 
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
-                    <div className="flex items-center gap-2">
-                      <Eye className="w-4 h-4" />
-                      <span>{featuredVideo.views.toLocaleString()} views</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Heart className="w-4 h-4" />
-                      <span>{featuredVideo.likes.toLocaleString()} likes</span>
-                    </div>
-                    <button className="flex items-center gap-2 hover:text-primary-600 transition-colors">
-                      <Share2 className="w-4 h-4" />
-                      <span>Share</span>
-                    </button>
+                <div className="flex items-center gap-6 text-sm text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    <span>Featured Video</span>
                   </div>
+                  <button className="flex items-center gap-2 hover:text-primary-600 transition-colors">
+                    <Share2 className="w-4 h-4" />
+                    <span>Share</span>
+                  </button>
                 </div>
               </div>
-            ) : (
-              <div className="video-container bg-gray-100 flex items-center justify-center">
-                <PlayCircle className="w-20 h-20 text-gray-400" />
-              </div>
-            )}
+            </div>
           </motion.div>
         </div>
       </section>
-
-      {/* Featured Products */}
-      {featuredVideo && featuredVideo.products.length > 0 && (
-        <section className="section-container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold mb-2">Featured in This Video</h2>
-                <p className="text-gray-600">Products Sam Altman recommends</p>
-              </div>
-              <Link href="/products">
-                <button className="btn-secondary flex items-center gap-2">
-                  <span>View All</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </Link>
-            </div>
-
-            <ProductCarousel products={featuredVideo.products} />
-          </motion.div>
-        </section>
-      )}
 
       {/* Features Section */}
       <section className="section-container py-20">
