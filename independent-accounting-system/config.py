@@ -4,6 +4,7 @@ Configuration for NERDX Independent Accounting System
 """
 from pydantic_settings import BaseSettings
 from typing import Literal, Optional
+import os
 
 
 class Settings(BaseSettings):
@@ -11,7 +12,7 @@ class Settings(BaseSettings):
 
     # API
     api_host: str = "0.0.0.0"
-    api_port: int = 8003
+    api_port: int = int(os.getenv("PORT", 8003))
     api_environment: str = "development"
 
     # Salesforce Integration
