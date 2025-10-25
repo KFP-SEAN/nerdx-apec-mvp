@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Read(//c/Users/seans/nerdx-apec-mvp/**)",
-      "Read(//c/Users/seans/**)"
+      "Read(//c/Users/seans/**)",
+      "Bash(python update_attachment_processor.py:*)",
+      "Bash(/c/Users/seans/AppData/Local/Programs/Python/Python313/python.exe:*)",
+      "Bash(chmod:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pip install:*)",
+      "Bash(PYTHONIOENCODING=utf-8 /c/Users/seans/AppData/Local/Programs/Python/Python313/python.exe:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

@@ -70,8 +70,11 @@ async def test_email(email: str):
         if success:
             return {"message": f"Test email sent to {email}"}
         else:
-            raise HTTPException(status_code=500, detail="Failed to send test email")
+            error_detail = email_service.last_error or "Failed to send test email (no error details)"
+            raise HTTPException(status_code=500, detail=error_detail)
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Failed to send test email: {e}")
         raise HTTPException(status_code=500, detail=str(e))

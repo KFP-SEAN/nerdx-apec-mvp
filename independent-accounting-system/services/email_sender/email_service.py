@@ -4,6 +4,7 @@ Email Sending Service
 """
 import logging
 import smtplib
+import traceback
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
@@ -24,6 +25,7 @@ class EmailService:
         self.smtp_password = settings.smtp_password
         self.from_email = settings.smtp_from_email
         self.use_tls = settings.smtp_use_tls
+        self.last_error = None  # Store last error for debugging
 
     async def send_email(
         self,
@@ -45,6 +47,12 @@ class EmailService:
             True if successful
         """
         try:
+            # Log SMTP configuration (without password)
+            logger.info(f"[SMTP] Attempting to send email to {to_email}")
+            logger.info(f"[SMTP] Configuration: host={self.smtp_host}, port={self.smtp_port}, use_tls={self.use_tls}")
+            logger.info(f"[SMTP] Username: {self.smtp_username}, From: {self.from_email}")
+            logger.info(f"[SMTP] Password length: {len(self.smtp_password) if self.smtp_password else 0}")
+
             # Create message
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
@@ -61,25 +69,57 @@ class EmailService:
             msg.attach(part2)
 
             # Connect to SMTP server
+            logger.info(f"[SMTP] Connecting to {self.smtp_host}:{self.smtp_port}...")
             if self.use_tls:
-                server = smtplib.SMTP(self.smtp_host, self.smtp_port)
+                server = smtplib.SMTP(self.smtp_host, self.smtp_port, timeout=30)
+                logger.info("[SMTP] Starting TLS...")
                 server.starttls()
             else:
-                server = smtplib.SMTP(self.smtp_host, self.smtp_port)
+                server = smtplib.SMTP(self.smtp_host, self.smtp_port, timeout=30)
+
+            logger.info("[SMTP] Connection established")
 
             # Login
             if self.smtp_username and self.smtp_password:
+                logger.info(f"[SMTP] Authenticating as {self.smtp_username}...")
                 server.login(self.smtp_username, self.smtp_password)
+                logger.info("[SMTP] Authentication successful")
 
             # Send email
+            logger.info(f"[SMTP] Sending email to {to_email}...")
             server.sendmail(self.from_email, [to_email], msg.as_string())
             server.quit()
 
-            logger.info(f"Email sent successfully to {to_email}")
+            logger.info(f"[SMTP] ✅ Email sent successfully to {to_email}")
+            self.last_error = None
             return True
 
+        except smtplib.SMTPAuthenticationError as e:
+            error_msg = f"SMTP Authentication Error: {e}"
+            error_detail = f"{error_msg}\n{traceback.format_exc()}"
+            logger.error(f"[SMTP] ❌ {error_detail}")
+            self.last_error = error_detail
+            return False
+
+        except smtplib.SMTPException as e:
+            error_msg = f"SMTP Error: {e}"
+            error_detail = f"{error_msg}\n{traceback.format_exc()}"
+            logger.error(f"[SMTP] ❌ {error_detail}")
+            self.last_error = error_detail
+            return False
+
+        except OSError as e:
+            error_msg = f"Network/OS Error: {e}"
+            error_detail = f"{error_msg}\n{traceback.format_exc()}"
+            logger.error(f"[SMTP] ❌ {error_detail}")
+            self.last_error = error_detail
+            return False
+
         except Exception as e:
-            logger.error(f"Failed to send email to {to_email}: {e}")
+            error_msg = f"Unexpected error: {type(e).__name__}: {e}"
+            error_detail = f"{error_msg}\n{traceback.format_exc()}"
+            logger.error(f"[SMTP] ❌ {error_detail}")
+            self.last_error = error_detail
             return False
 
     async def send_daily_report_email(self, email_data: DailyReportEmail) -> bool:
