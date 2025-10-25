@@ -125,11 +125,9 @@ class FinancialService:
                     cost_id=cost_id,
                     cell_id=cell_id,
                     odoo_invoice_id=record.get('odoo_invoice_id'),
-                    odoo_invoice_line_id=record['odoo_invoice_line_id'],
                     cost_date=record['cost_date'],
                     cost_amount=record['cost_amount'],
-                    cost_category=record['cost_category'],
-                    related_product=record.get('related_product'),
+                    category=record.get('category', 'COGS'),
                     description=record.get('description')
                 )
 
@@ -186,7 +184,7 @@ class FinancialService:
                 and_(
                     CostRecordDB.cell_id == cell_id,
                     CostRecordDB.cost_date == summary_date,
-                    CostRecordDB.cost_category == 'COGS'
+                    CostRecordDB.category == 'COGS'
                 )
             ).first()
 

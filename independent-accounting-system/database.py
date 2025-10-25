@@ -89,26 +89,24 @@ class CostRecordDB(Base):
 
     cost_id = Column(String(100), primary_key=True, index=True)
     cell_id = Column(String(100), nullable=False, index=True)
-
-    # Odoo
-    odoo_invoice_id = Column(Integer, index=True)
-    odoo_invoice_line_id = Column(Integer)
-
-    # Cost
     cost_date = Column(Date, nullable=False, index=True)
     cost_amount = Column(Numeric(15, 2), nullable=False)
     currency = Column(String(10), default="KRW")
+    category = Column(String(100), nullable=False)  # Changed from cost_category
+    source = Column(String(100))
 
-    # Category
-    cost_category = Column(String(100), nullable=False)
-    cost_type = Column(String(100))
+    # Odoo
+    odoo_invoice_id = Column(Integer, index=True)
+    odoo_analytic_account_id = Column(Integer)
 
-    # Relations
-    related_product = Column(String(200))
-    related_revenue_id = Column(String(100))
+    # Vendor info
+    vendor_name = Column(String(200))
+    invoice_number = Column(String(100))
 
     # Metadata
     description = Column(Text)
+    tags = Column(JSON)
+    metadata = Column(JSON)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
