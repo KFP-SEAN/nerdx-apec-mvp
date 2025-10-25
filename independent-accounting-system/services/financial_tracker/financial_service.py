@@ -58,10 +58,10 @@ class FinancialService:
             # Save to database
             count = 0
             for record in revenue_records:
-                record_id = f"rev-{uuid4().hex[:12]}"
+                revenue_id = f"rev-{uuid4().hex[:12]}"
 
                 db_record = RevenueRecordDB(
-                    record_id=record_id,
+                    revenue_id=revenue_id,
                     cell_id=cell_id,
                     salesforce_opportunity_id=record['salesforce_opportunity_id'],
                     salesforce_account_id=record['salesforce_account_id'],
@@ -119,10 +119,10 @@ class FinancialService:
             # Save to database
             count = 0
             for record in cost_records:
-                record_id = f"cost-{uuid4().hex[:12]}"
+                cost_id = f"cost-{uuid4().hex[:12]}"
 
                 db_record = CostRecordDB(
-                    record_id=record_id,
+                    cost_id=cost_id,
                     cell_id=cell_id,
                     odoo_invoice_id=record.get('odoo_invoice_id'),
                     odoo_invoice_line_id=record['odoo_invoice_line_id'],
@@ -167,7 +167,7 @@ class FinancialService:
             # Get revenue total
             revenue_result = db.query(
                 func.sum(RevenueRecordDB.revenue_amount).label('total'),
-                func.count(RevenueRecordDB.record_id).label('count')
+                func.count(RevenueRecordDB.revenue_id).label('count')
             ).filter(
                 and_(
                     RevenueRecordDB.cell_id == cell_id,
@@ -181,7 +181,7 @@ class FinancialService:
             # Get cost total (COGS)
             cost_result = db.query(
                 func.sum(CostRecordDB.cost_amount).label('total'),
-                func.count(CostRecordDB.record_id).label('count')
+                func.count(CostRecordDB.cost_id).label('count')
             ).filter(
                 and_(
                     CostRecordDB.cell_id == cell_id,
