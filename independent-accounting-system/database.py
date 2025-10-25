@@ -106,7 +106,7 @@ class CostRecordDB(Base):
     # Metadata
     description = Column(Text)
     tags = Column(JSON)
-    metadata = Column(JSON)
+    extra_data = Column(JSON)  # Renamed from metadata (reserved word in SQLAlchemy)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
