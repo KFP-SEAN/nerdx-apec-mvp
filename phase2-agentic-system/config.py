@@ -48,9 +48,18 @@ class Settings(BaseSettings):
     # Rate Limiting
     max_cameo_per_user_per_day: int = 5
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    # Helios Orchestration
+    helios_max_messages_per_window: int = 900
+    helios_window_hours: int = 5
+    helios_opus_cost_multiplier: float = 5.0
+    helios_throttle_threshold: float = 0.80
+    helios_critical_threshold: float = 0.95
+
+    model_config = {
+        "extra": "allow",  # Allow extra fields from .env
+        "env_file": ".env",
+        "case_sensitive": False
+    }
 
 
 settings = Settings()

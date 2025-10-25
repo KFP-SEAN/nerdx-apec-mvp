@@ -1,6 +1,6 @@
 """
 Phase 2: Agentic System - FastAPI Application
-CAMEO personalized video generation service with Sora 2 integration
+CAMEO personalized video generation service with Sora 2 integration + Helios Orchestration
 """
 import logging
 from contextlib import asynccontextmanager
@@ -25,6 +25,9 @@ from models.cameo_models import (
 from services.cameo_service import cameo_service, CAMEOServiceError, RateLimitExceeded, QueueFullError
 from services.sora_service import sora_service
 from services.storage_service import storage_service
+
+# Helios imports
+from routers import helios_resources, helios_cache, helios_agents, helios_monitoring
 
 # Configure logging
 logging.basicConfig(
@@ -76,9 +79,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="NERDX APEC MVP - Phase 2: Agentic System",
-    description="CAMEO personalized video generation with Sora 2 integration",
-    version="1.0.0",
+    title="NERDX APEC MVP - Phase 2: Agentic System + Helios",
+    description="CAMEO personalized video generation with Sora 2 integration + Claude Max orchestration",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
@@ -90,6 +93,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include Helios routers
+app.include_router(helios_resources.router)
+app.include_router(helios_cache.router)
+app.include_router(helios_agents.router)
+app.include_router(helios_monitoring.router)
 
 
 # Exception handlers
@@ -465,16 +474,31 @@ async def get_config():
 async def root():
     """API root endpoint"""
     return {
-        "service": "NERDX APEC MVP - Phase 2: Agentic System",
-        "version": "1.0.0",
-        "description": "CAMEO personalized video generation with Sora 2",
+        "service": "NERDX APEC MVP - Phase 2: Agentic System + Helios",
+        "version": "2.0.0",
+        "description": "CAMEO personalized video generation with Sora 2 + Claude Max orchestration",
         "endpoints": {
             "health": "/health",
             "docs": "/docs",
+
+            # CAMEO endpoints
             "generate_video": "POST /api/v1/cameo/generate",
             "video_status": "GET /api/v1/cameo/status/{job_id}",
             "list_videos": "GET /api/v1/cameo/videos/{user_id}",
             "queue_status": "GET /api/v1/cameo/queue/status",
+
+            # Helios orchestration endpoints
+            "budget_status": "GET /api/v1/helios/budget/status",
+            "request_resources": "POST /api/v1/helios/budget/request",
+            "usage_metrics": "GET /api/v1/helios/budget/metrics",
+            "budget_summary": "GET /api/v1/helios/budget/summary",
+
+            # Helios caching endpoints
+            "cache_lookup": "POST /api/v1/helios/cache/lookup",
+            "cache_store": "POST /api/v1/helios/cache/store",
+            "cache_metrics": "GET /api/v1/helios/cache/metrics",
+            "cache_summary": "GET /api/v1/helios/cache/summary",
+            "cache_invalidate": "POST /api/v1/helios/cache/invalidate",
         }
     }
 

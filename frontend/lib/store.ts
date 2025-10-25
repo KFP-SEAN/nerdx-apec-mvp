@@ -1,22 +1,26 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import {
+  Cart,
+  cartCreate,
+  cartGet,
+  cartLinesAdd,
+  cartLinesUpdate,
+  cartLinesRemove,
+  getOrCreateCart
+} from './shopify/cart';
+import toast from 'react-hot-toast';
 
-// Cart Store
-interface CartItem {
-  id: string;
-  product_id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image_url: string;
-}
-
+// Cart Store with Shopify Integration
 interface CartStore {
-  items: CartItem[];
-  addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  cart: Cart | null;
+  isLoading: boolean;
+  error: string | null;
+  addItem: (variantId: string, quantity: number) => Promise<void>;
+  updateItem: (lineId: string, quantity: number) => Promise<void>;
+  removeItem: (lineId: string) => Promise<void>;
   clearCart: () => void;
+  syncWithServer: () => Promise<void>;
   getTotalItems: () => number;
   getTotalPrice: () => number;
 }
@@ -24,50 +28,125 @@ interface CartStore {
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
-      items: [],
-      addItem: (item) => {
-        const items = get().items;
-        const existingItem = items.find((i) => i.product_id === item.product_id);
+      cart: null,
+      isLoading: false,
+      error: null,
 
-        if (existingItem) {
-          set({
-            items: items.map((i) =>
-              i.product_id === item.product_id
-                ? { ...i, quantity: i.quantity + item.quantity }
-                : i
-            ),
-          });
-        } else {
-          set({ items: [...items, item] });
+      addItem: async (variantId: string, quantity: number) => {
+        set({ isLoading: true, error: null });
+        try {
+          const currentCart = get().cart;
+
+          if (!currentCart) {
+            // Create new cart
+            const newCart = await cartCreate([
+              { merchandiseId: variantId, quantity }
+            ]);
+            set({ cart: newCart, isLoading: false });
+          } else {
+            // Add to existing cart
+            const updatedCart = await cartLinesAdd(
+              currentCart.id,
+              [{ merchandiseId: variantId, quantity }]
+            );
+            set({ cart: updatedCart, isLoading: false });
+          }
+
+          toast.success('Added to cart');
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to add to cart';
+          set({ isLoading: false, error: errorMessage });
+          toast.error(errorMessage);
+          throw error;
         }
       },
-      removeItem: (id) => {
-        set({ items: get().items.filter((i) => i.id !== id) });
-      },
-      updateQuantity: (id, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(id);
-        } else {
-          set({
-            items: get().items.map((i) =>
-              i.id === id ? { ...i, quantity } : i
-            ),
-          });
+
+      updateItem: async (lineId: string, quantity: number) => {
+        set({ isLoading: true, error: null });
+        try {
+          const currentCart = get().cart;
+          if (!currentCart) {
+            set({ isLoading: false });
+            return;
+          }
+
+          const updatedCart = await cartLinesUpdate(
+            currentCart.id,
+            [{ id: lineId, quantity }]
+          );
+          set({ cart: updatedCart, isLoading: false });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to update quantity';
+          set({ isLoading: false, error: errorMessage });
+          toast.error(errorMessage);
+          throw error;
         }
       },
-      clearCart: () => set({ items: [] }),
+
+      removeItem: async (lineId: string) => {
+        set({ isLoading: true, error: null });
+        try {
+          const currentCart = get().cart;
+          if (!currentCart) {
+            set({ isLoading: false });
+            return;
+          }
+
+          const updatedCart = await cartLinesRemove(
+            currentCart.id,
+            [lineId]
+          );
+          set({ cart: updatedCart, isLoading: false });
+          toast.success('Item removed from cart');
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to remove item';
+          set({ isLoading: false, error: errorMessage });
+          toast.error(errorMessage);
+          throw error;
+        }
+      },
+
+      clearCart: () => {
+        set({ cart: null });
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('cartId');
+        }
+        toast.success('Cart cleared');
+      },
+
+      syncWithServer: async () => {
+        if (typeof window === 'undefined') return;
+
+        const cartId = localStorage.getItem('cartId');
+        if (!cartId) {
+          set({ cart: null });
+          return;
+        }
+
+        try {
+          const cart = await cartGet(cartId);
+          set({ cart });
+        } catch (error) {
+          // Cart not found or expired
+          console.warn('Cart not found, clearing local storage');
+          localStorage.removeItem('cartId');
+          set({ cart: null });
+        }
+      },
+
       getTotalItems: () => {
-        return get().items.reduce((sum, item) => sum + item.quantity, 0);
+        const cart = get().cart;
+        return cart?.totalQuantity || 0;
       },
+
       getTotalPrice: () => {
-        return get().items.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        );
+        const cart = get().cart;
+        return cart ? parseFloat(cart.cost.totalAmount.amount) : 0;
       },
     }),
     {
       name: 'cart-storage',
+      partialize: (state) => ({ cart: state.cart }),
     }
   )
 );
