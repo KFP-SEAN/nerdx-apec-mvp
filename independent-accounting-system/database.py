@@ -59,7 +59,7 @@ class RevenueRecordDB(Base):
     """Revenue record database model"""
     __tablename__ = "revenue_records"
 
-    record_id = Column(String(100), primary_key=True, index=True)
+    revenue_id = Column(String(100), primary_key=True, index=True)
     cell_id = Column(String(100), nullable=False, index=True)
 
     # Salesforce
@@ -87,7 +87,7 @@ class CostRecordDB(Base):
     """Cost record database model"""
     __tablename__ = "cost_records"
 
-    record_id = Column(String(100), primary_key=True, index=True)
+    cost_id = Column(String(100), primary_key=True, index=True)
     cell_id = Column(String(100), nullable=False, index=True)
 
     # Odoo
