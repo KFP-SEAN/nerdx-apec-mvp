@@ -205,9 +205,9 @@ class DailyReportService:
 
         return [
             {
-                'cost_category': r.cost_category,
+                'cost_category': r.category,
                 'cost_amount': float(r.cost_amount),
-                'related_product': r.related_product or 'N/A',
+                'related_product': r.product_name or 'N/A',
                 'description': r.description
             }
             for r in records
