@@ -45,6 +45,7 @@ CREATE TABLE cells (
     status cell_status DEFAULT 'active',
     manager_name VARCHAR(100),
     manager_email VARCHAR(200) NOT NULL,
+    manager_phone VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

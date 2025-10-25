@@ -62,20 +62,24 @@ class RevenueRecordDB(Base):
     revenue_id = Column(String(100), primary_key=True, index=True)
     cell_id = Column(String(100), nullable=False, index=True)
 
-    # Salesforce
+    # Salesforce Standard Fields
     salesforce_opportunity_id = Column(String(100), index=True)
     salesforce_account_id = Column(String(100), index=True)
+    opportunity_name = Column(String(200))  # Standard: Opportunity.Name
+    stage = Column(String(100))  # Standard: Opportunity.StageName
+    probability = Column(Float)  # Standard: Opportunity.Probability
+    opportunity_type = Column(String(100))  # Standard: Opportunity.Type
 
     # Revenue
     revenue_date = Column(Date, nullable=False, index=True)
     revenue_amount = Column(Numeric(15, 2), nullable=False)
     currency = Column(String(10), default="KRW")
 
-    # Product/Service
-    product_name = Column(String(200))
-    product_category = Column(String(100))
-    quantity = Column(Integer)
-    unit_price = Column(Numeric(15, 2))
+    # Product/Service (Custom Fields - Optional)
+    product_name = Column(String(200))  # Custom: Product__c
+    product_category = Column(String(100))  # Custom: derived field
+    quantity = Column(Integer)  # Custom: Quantity__c
+    unit_price = Column(Numeric(15, 2))  # Custom: UnitPrice__c
 
     # Metadata
     description = Column(Text)
@@ -92,21 +96,25 @@ class CostRecordDB(Base):
     cost_date = Column(Date, nullable=False, index=True)
     cost_amount = Column(Numeric(15, 2), nullable=False)
     currency = Column(String(10), default="KRW")
-    category = Column(String(100), nullable=False)  # Changed from cost_category
-    source = Column(String(100))
+    category = Column(String(100), nullable=False)  # COGS, OpEx, etc.
+    source = Column(String(100))  # 'odoo', 'manual', etc.
 
-    # Odoo
-    odoo_invoice_id = Column(Integer, index=True)
-    odoo_analytic_account_id = Column(Integer)
+    # Odoo Standard Fields
+    odoo_invoice_id = Column(Integer, index=True)  # account.move (invoice header)
+    odoo_invoice_line_id = Column(Integer, index=True)  # account.move.line (invoice line item)
+    odoo_analytic_account_id = Column(Integer)  # analytic.account (for cell tracking)
+    odoo_product_id = Column(Integer)  # product.product
+    odoo_partner_id = Column(Integer)  # res.partner (vendor)
 
     # Vendor info
     vendor_name = Column(String(200))
     invoice_number = Column(String(100))
+    product_name = Column(String(200))  # Odoo: product.product.name
 
     # Metadata
     description = Column(Text)
     tags = Column(JSON)
-    extra_data = Column(JSON)  # Renamed from metadata (reserved word in SQLAlchemy)
+    extra_data = Column(JSON)  # Additional custom fields (renamed from metadata - reserved word)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

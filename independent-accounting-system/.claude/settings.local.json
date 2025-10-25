@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/seans/nerdx-apec-mvp/**)",
+      "Read(//c/Users/seans/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

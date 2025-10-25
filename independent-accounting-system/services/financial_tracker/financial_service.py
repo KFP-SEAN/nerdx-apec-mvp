@@ -63,11 +63,19 @@ class FinancialService:
                 db_record = RevenueRecordDB(
                     revenue_id=revenue_id,
                     cell_id=cell_id,
+                    # Standard Salesforce fields
                     salesforce_opportunity_id=record['salesforce_opportunity_id'],
                     salesforce_account_id=record['salesforce_account_id'],
+                    opportunity_name=record.get('opportunity_name'),
+                    stage=record.get('stage'),
+                    probability=record.get('probability'),
+                    opportunity_type=record.get('opportunity_type'),
+                    # Revenue data
                     revenue_date=record['revenue_date'],
                     revenue_amount=record['revenue_amount'],
+                    # Custom fields (optional)
                     product_name=record.get('product_name'),
+                    product_category=record.get('product_category'),
                     quantity=record.get('quantity'),
                     unit_price=record.get('unit_price'),
                     description=record.get('description')
@@ -124,10 +132,21 @@ class FinancialService:
                 db_record = CostRecordDB(
                     cost_id=cost_id,
                     cell_id=cell_id,
+                    # Odoo standard fields
                     odoo_invoice_id=record.get('odoo_invoice_id'),
+                    odoo_invoice_line_id=record.get('odoo_invoice_line_id'),
+                    odoo_analytic_account_id=record.get('odoo_analytic_account_id'),
+                    odoo_product_id=record.get('odoo_product_id'),
+                    odoo_partner_id=record.get('odoo_partner_id'),
+                    # Cost data
                     cost_date=record['cost_date'],
                     cost_amount=record['cost_amount'],
                     category=record.get('category', 'COGS'),
+                    source=record.get('source', 'odoo'),
+                    # Vendor/Product info
+                    vendor_name=record.get('vendor_name'),
+                    invoice_number=record.get('invoice_number'),
+                    product_name=record.get('product_name'),
                     description=record.get('description')
                 )
 
