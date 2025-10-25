@@ -38,11 +38,14 @@ class Settings(BaseSettings):
     redis_db: int = 2
 
     # Email Configuration
+    resend_api_key: str = ""
+    smtp_from_email: str = ""
+
+    # Legacy SMTP (fallback)
     smtp_host: str = "smtp.gmail.com"
     smtp_port: int = 587
     smtp_username: str = ""
     smtp_password: str = ""
-    smtp_from_email: str = ""
     smtp_use_tls: bool = True
 
     # Daily Report Configuration

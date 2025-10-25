@@ -18,7 +18,7 @@ simple-salesforce==1.12.5
 # Uses built-in xmlrpc.client
 
 # Email
-# Uses built-in smtplib
+resend==0.8.0
 
 # Redis (for caching - optional)
 redis==5.0.1
