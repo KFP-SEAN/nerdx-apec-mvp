@@ -2,9 +2,11 @@
 Database configuration and models using SQLAlchemy
 """
 from sqlalchemy import create_engine, Column, String, Integer, Float, Date, DateTime, Boolean, Numeric, Text, JSON
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import uuid
 from config import settings
 
 # Create engine
@@ -59,7 +61,7 @@ class RevenueRecordDB(Base):
     """Revenue record database model"""
     __tablename__ = "revenue_records"
 
-    revenue_id = Column(String(100), primary_key=True, index=True)
+    revenue_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     cell_id = Column(String(100), nullable=False, index=True)
 
     # Salesforce Standard Fields
@@ -91,7 +93,7 @@ class CostRecordDB(Base):
     """Cost record database model"""
     __tablename__ = "cost_records"
 
-    cost_id = Column(String(100), primary_key=True, index=True)
+    cost_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     cell_id = Column(String(100), nullable=False, index=True)
     cost_date = Column(Date, nullable=False, index=True)
     cost_amount = Column(Numeric(15, 2), nullable=False)
