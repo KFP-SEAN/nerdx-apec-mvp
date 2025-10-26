@@ -68,7 +68,7 @@ def test_tier1_lead():
     print(f"\nFinal NBRS: {nbrs:.2f}")
     print(f"Tier: {tier.value.upper()}")
     print(f"Expected: TIER1 (≥80)")
-    print(f"Result: {'✓ PASS' if tier.value == 'tier1' else '✗ FAIL'}")
+    print(f"Result: {'PASS' if tier.value == 'tier1' else 'FAIL'}")
 
     return tier.value == 'tier1'
 
@@ -80,35 +80,35 @@ def test_tier2_lead():
     print("="*70)
 
     brand_affinity = BrandAffinityScore(
-        past_interaction_score=75,
-        email_engagement_score=80,
-        meeting_history_score=70,
-        relationship_duration_score=85,
-        contact_frequency_score=75,
-        decision_maker_access_score=90,
-        nps_score=80,
-        testimonial_provided=True,
+        past_interaction_score=60,
+        email_engagement_score=65,
+        meeting_history_score=55,
+        relationship_duration_score=70,
+        contact_frequency_score=60,
+        decision_maker_access_score=75,
+        nps_score=65,
+        testimonial_provided=False,
         reference_willing=True
     )
 
     market_positioning = MarketPositioningScore(
-        annual_revenue_krw=100_000_000_000,  # 1000억원
-        employee_count=500,
-        marketing_budget_krw=1_000_000_000,  # 10억원
+        annual_revenue_krw=80_000_000_000,  # 800억원
+        employee_count=300,
+        marketing_budget_krw=800_000_000,  # 8억원
         target_industry_match=True,
-        target_geography_match=True,
-        pain_point_alignment_score=85,
-        revenue_growth_yoy=30,
-        expansion_plans_score=80
+        target_geography_match=False,
+        pain_point_alignment_score=70,
+        revenue_growth_yoy=20,
+        expansion_plans_score=65
     )
 
     digital_presence = DigitalPresenceScore(
-        website_traffic_monthly=100_000,
-        social_media_followers=25_000,
-        content_engagement_score=85,
+        website_traffic_monthly=50_000,
+        social_media_followers=15_000,
+        content_engagement_score=70,
         modern_website=True,
-        marketing_automation=True,
-        mobile_app=True,
+        marketing_automation=False,
+        mobile_app=False,
         ecommerce_enabled=True
     )
 
@@ -133,7 +133,7 @@ def test_tier2_lead():
     print(f"\nFinal NBRS: {nbrs:.2f}")
     print(f"Tier: {tier.value.upper()}")
     print(f"Expected: TIER2 (60-79)")
-    print(f"Result: {'✓ PASS' if tier.value == 'tier2' else '✗ FAIL'}")
+    print(f"Result: {'PASS' if tier.value == 'tier2' else 'FAIL'}")
 
     return tier.value == 'tier2'
 
@@ -198,7 +198,7 @@ def test_tier4_lead():
     print(f"\nFinal NBRS: {nbrs:.2f}")
     print(f"Tier: {tier.value.upper()}")
     print(f"Expected: TIER4 (<40)")
-    print(f"Result: {'✓ PASS' if tier.value == 'tier4' else '✗ FAIL'}")
+    print(f"Result: {'PASS' if tier.value == 'tier4' else 'FAIL'}")
 
     return tier.value == 'tier4'
 
@@ -221,12 +221,12 @@ if __name__ == "__main__":
     total = len(results)
 
     for name, result in results:
-        status = "✓ PASS" if result else "✗ FAIL"
+        status = "PASS" if result else "FAIL"
         print(f"{name}: {status}")
 
     print(f"\nOverall: {passed}/{total} tests passed")
 
     if passed == total:
-        print("\n✓ All tests passed! NBRS model is working correctly.")
+        print("\nAll tests passed! NBRS model is working correctly.")
     else:
-        print(f"\n✗ {total - passed} test(s) failed. Review scoring logic.")
+        print(f"\n{total - passed} test(s) failed. Review scoring logic.")
