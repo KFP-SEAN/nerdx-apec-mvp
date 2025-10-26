@@ -1,0 +1,155 @@
+{
+  "label": "NBRS Lead Auto-Assignment",
+  "description": "Automatically assigns leads based on NBRS tier classification",
+  "processType": "AutoLaunchedFlow",
+  "status": "Draft",
+  "start": {
+    "object": "NBRS_Calculation__e",
+    "recordTriggerType": "Create",
+    "triggerType": "RecordAfterSave"
+  },
+  "decisions": [
+    {
+      "name": "Check_NBRS_Tier",
+      "label": "Check NBRS Tier",
+      "defaultConnector": {
+        "targetReference": "TIER4_Actions"
+      },
+      "rules": [
+        {
+          "name": "Is_TIER1",
+          "conditionLogic": "and",
+          "conditions": [
+            {
+              "leftValueReference": "$Record.NBRS_Tier__c",
+              "operator": "EqualTo",
+              "rightValue": {
+                "stringValue": "TIER1"
+              }
+            }
+          ],
+          "connector": {
+            "targetReference": "TIER1_Actions"
+          },
+          "label": "Is TIER1"
+        },
+        {
+          "name": "Is_TIER2",
+          "conditionLogic": "and",
+          "conditions": [
+            {
+              "leftValueReference": "$Record.NBRS_Tier__c",
+              "operator": "EqualTo",
+              "rightValue": {
+                "stringValue": "TIER2"
+              }
+            }
+          ],
+          "connector": {
+            "targetReference": "TIER2_Actions"
+          },
+          "label": "Is TIER2"
+        },
+        {
+          "name": "Is_TIER3",
+          "conditionLogic": "and",
+          "conditions": [
+            {
+              "leftValueReference": "$Record.NBRS_Tier__c",
+              "operator": "EqualTo",
+              "rightValue": {
+                "stringValue": "TIER3"
+              }
+            }
+          ],
+          "connector": {
+            "targetReference": "TIER3_Actions"
+          },
+          "label": "Is TIER3"
+        }
+      ]
+    }
+  ],
+  "actionCalls": [
+    {
+      "name": "TIER1_Actions",
+      "label": "TIER1 Actions - High Priority",
+      "actionType": "apex",
+      "inputParameters": [
+        {
+          "name": "leadId",
+          "value": {
+            "elementReference": "$Record.Lead_ID__c"
+          }
+        },
+        {
+          "name": "action",
+          "value": {
+            "stringValue": "tier1_assignment"
+          }
+        }
+      ],
+      "description": "Assign TIER1 lead to senior sales rep and create high-priority task"
+    },
+    {
+      "name": "TIER2_Actions",
+      "label": "TIER2 Actions - Medium Priority",
+      "actionType": "apex",
+      "inputParameters": [
+        {
+          "name": "leadId",
+          "value": {
+            "elementReference": "$Record.Lead_ID__c"
+          }
+        },
+        {
+          "name": "action",
+          "value": {
+            "stringValue": "tier2_assignment"
+          }
+        }
+      ],
+      "description": "Assign TIER2 lead to sales rep and schedule discovery call"
+    },
+    {
+      "name": "TIER3_Actions",
+      "label": "TIER3 Actions - Low Priority",
+      "actionType": "apex",
+      "inputParameters": [
+        {
+          "name": "leadId",
+          "value": {
+            "elementReference": "$Record.Lead_ID__c"
+          }
+        },
+        {
+          "name": "action",
+          "value": {
+            "stringValue": "tier3_assignment"
+          }
+        }
+      ],
+      "description": "Add TIER3 lead to nurturing campaign"
+    },
+    {
+      "name": "TIER4_Actions",
+      "label": "TIER4 Actions - Low Priority Pool",
+      "actionType": "apex",
+      "inputParameters": [
+        {
+          "name": "leadId",
+          "value": {
+            "elementReference": "$Record.Lead_ID__c"
+          }
+        },
+        {
+          "name": "action",
+          "value": {
+            "stringValue": "tier4_assignment"
+          }
+        }
+      ],
+      "description": "Add TIER4 lead to low-priority pool"
+    }
+  ]
+}
