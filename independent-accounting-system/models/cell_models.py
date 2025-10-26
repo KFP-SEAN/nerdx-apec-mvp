@@ -12,6 +12,9 @@ class CellType(str, Enum):
     DOMESTIC = "domestic"  # 국내 셀
     GLOBAL = "global"      # 글로벌 셀
     NEW_MARKET = "new_market"  # 신규시장 셀
+    PRODUCT = "product"  # 제품 셀
+    MARKETING = "marketing"  # 마케팅 셀
+    SALES = "sales"  # 영업 셀
 
 
 class CellStatus(str, Enum):
