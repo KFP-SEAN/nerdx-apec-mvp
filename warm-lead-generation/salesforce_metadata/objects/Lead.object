@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>NBRS_Score__c</fullName>
+        <label>NBRS Score</label>
+        <description>Overall NBRS score (0-100)</description>
+        <precision>5</precision>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+        <externalId>false</externalId>
+    </fields>
+    <fields>
+        <fullName>NBRS_Tier__c</fullName>
+        <label>NBRS Tier</label>
+        <description>Lead tier classification (TIER1=Top, TIER4=Low)</description>
+        <type>Picklist</type>
+        <valueSet>
+            <valueSetDefinition>
+                <value>
+                    <fullName>TIER1</fullName>
+                    <default>false</default>
+                    <label>TIER1</label>
+                </value>
+                <value>
+                    <fullName>TIER2</fullName>
+                    <default>false</default>
+                    <label>TIER2</label>
+                </value>
+                <value>
+                    <fullName>TIER3</fullName>
+                    <default>false</default>
+                    <label>TIER3</label>
+                </value>
+                <value>
+                    <fullName>TIER4</fullName>
+                    <default>false</default>
+                    <label>TIER4</label>
+                </value>
+            </valueSetDefinition>
+        </valueSet>
+    </fields>
+    <fields>
+        <fullName>Brand_Affinity_Score__c</fullName>
+        <label>Brand Affinity Score</label>
+        <description>Brand affinity component (0-100)</description>
+        <precision>5</precision>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+        <externalId>false</externalId>
+    </fields>
+    <fields>
+        <fullName>Market_Positioning_Score__c</fullName>
+        <label>Market Positioning Score</label>
+        <description>Market positioning component (0-100)</description>
+        <precision>5</precision>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+        <externalId>false</externalId>
+    </fields>
+    <fields>
+        <fullName>Digital_Presence_Score__c</fullName>
+        <label>Digital Presence Score</label>
+        <description>Digital presence component (0-100)</description>
+        <precision>5</precision>
+        <scale>2</scale>
+        <type>Number</type>
+        <unique>false</unique>
+        <externalId>false</externalId>
+    </fields>
+    <fields>
+        <fullName>NBRS_Calculated_Date__c</fullName>
+        <label>NBRS Calculated Date</label>
+        <description>When NBRS was last calculated</description>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Priority_Rank__c</fullName>
+        <label>Priority Rank</label>
+        <description>Ranking among all leads (#1 = highest priority)</description>
+        <precision>5</precision>
+        <scale>0</scale>
+        <type>Number</type>
+        <unique>false</unique>
+        <externalId>false</externalId>
+    </fields>
+    <fields>
+        <fullName>Next_Action__c</fullName>
+        <label>Next Action</label>
+        <description>Recommended next action for this lead</description>
+        <length>255</length>
+        <type>Text</type>
+    </fields>
+</CustomObject>

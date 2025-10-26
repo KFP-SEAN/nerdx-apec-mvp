@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Lead.NBRS_Score__c</members>
+        <members>Lead.NBRS_Tier__c</members>
+        <members>Lead.Brand_Affinity_Score__c</members>
+        <members>Lead.Market_Positioning_Score__c</members>
+        <members>Lead.Digital_Presence_Score__c</members>
+        <members>Lead.NBRS_Calculated_Date__c</members>
+        <members>Lead.Priority_Rank__c</members>
+        <members>Lead.Next_Action__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>NBRS_Calculation__e</members>
+        <name>PlatformEventChannelMember</name>
+    </types>
+    <version>59.0</version>
+</Package>
