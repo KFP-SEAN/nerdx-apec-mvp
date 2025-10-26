@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
-from routers import lead_scoring
+from routers import lead_scoring, lead_report
 
 # Configure logging
 logging.basicConfig(
@@ -35,6 +35,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(lead_scoring.router)
+app.include_router(lead_report.router)
 
 
 @app.get("/")

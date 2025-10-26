@@ -11,6 +11,10 @@ simple-salesforce==1.12.5
 
 # HTTP Client
 httpx==0.25.2
+requests==2.31.0
+
+# Email Service
+resend==2.17.0
 
 # Utilities
 python-dotenv==1.0.0
