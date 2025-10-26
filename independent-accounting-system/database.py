@@ -61,7 +61,7 @@ class RevenueRecordDB(Base):
     """Revenue record database model"""
     __tablename__ = "revenue_records"
 
-    revenue_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    revenue_id = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
     cell_id = Column(String(100), nullable=False, index=True)
 
     # Salesforce Standard Fields
@@ -93,7 +93,7 @@ class CostRecordDB(Base):
     """Cost record database model"""
     __tablename__ = "cost_records"
 
-    cost_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    cost_id = Column(UUID(as_uuid=False), primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
     cell_id = Column(String(100), nullable=False, index=True)
     cost_date = Column(Date, nullable=False, index=True)
     cost_amount = Column(Numeric(15, 2), nullable=False)

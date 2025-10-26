@@ -13,7 +13,7 @@
     </types>
     <types>
         <members>NBRS_Calculation__e</members>
-        <name>PlatformEventChannelMember</name>
+        <name>CustomObject</name>
     </types>
     <version>59.0</version>
 </Package>

@@ -135,12 +135,14 @@ railway variables --set ODOO_DB=your_database_name
 railway variables --set ODOO_USERNAME=your_username
 railway variables --set ODOO_PASSWORD=YOUR_PASSWORD
 
-# Email (SMTP)
-railway variables --set SMTP_HOST=smtp.gmail.com
-railway variables --set SMTP_PORT=587
-railway variables --set SMTP_USERNAME=your_email@gmail.com
-railway variables --set SMTP_PASSWORD=YOUR_APP_PASSWORD
-railway variables --set SMTP_FROM_EMAIL=noreply@nerdx.com
+# Email (Resend API - SMTP is blocked on Railway!)
+# Get API key from: https://resend.com/api-keys
+railway variables --set RESEND_API_KEY=re_your_api_key_here
+railway variables --set SMTP_FROM_EMAIL=noreply@yourdomain.com
+
+# IMPORTANT: Railway blocks SMTP ports 25/587/465
+# You MUST use Resend API or another HTTP-based email service
+# See RAILWAY_EMAIL_SETUP.md for detailed instructions
 
 # Application Settings
 railway variables --set API_ENVIRONMENT=production
@@ -465,16 +467,23 @@ railway variables | grep DATABASE_URL
 railway add postgresql
 ```
 
-### Issue: SMTP email sending fails
+### Issue: Email sending fails
 
-**Solution**: Check Gmail app password
+**Solution**: Railway blocks SMTP ports - use Resend API instead
 
-1. Go to https://myaccount.google.com/apppasswords
-2. Generate new app password
-3. Update Railway variable:
+**IMPORTANT: Railway blocks SMTP ports (25, 587, 465) for security reasons.**
+
+You MUST use HTTP-based email APIs like Resend:
+
+1. Sign up at https://resend.com
+2. Verify your domain in Resend dashboard
+3. Get API key from https://resend.com/api-keys
+4. Update Railway variables:
    ```bash
-   railway variables --set SMTP_PASSWORD=YOUR_NEW_APP_PASSWORD
+   railway variables --set RESEND_API_KEY=re_your_api_key_here
+   railway variables --set SMTP_FROM_EMAIL=noreply@yourdomain.com
    ```
+5. See [RAILWAY_EMAIL_SETUP.md](./RAILWAY_EMAIL_SETUP.md) for detailed setup guide
 
 ### Issue: Out of memory errors
 
@@ -505,7 +514,8 @@ railway add postgresql
 - [ ] Database schema is initialized (tables exist)
 - [ ] Sample cells are created
 - [ ] Daily report generation works
-- [ ] Email sending works (test SMTP)
+- [ ] **Email sending works** (test with: `python test_email.py your_email@example.com`)
+- [ ] Resend API key is configured and domain is verified
 - [ ] Logs are clean (no errors)
 - [ ] Custom domain is configured (if applicable)
 - [ ] SSL certificate is valid
@@ -570,10 +580,8 @@ railway add postgresql
 | `ODOO_DB` | Yes | `production` | Odoo database name |
 | `ODOO_USERNAME` | Yes | `admin` | Odoo username |
 | `ODOO_PASSWORD` | Yes | `MyPassword123` | Odoo password |
-| `SMTP_HOST` | Yes | `smtp.gmail.com` | SMTP server hostname |
-| `SMTP_PORT` | Yes | `587` | SMTP server port |
-| `SMTP_USERNAME` | Yes | `noreply@company.com` | SMTP username |
-| `SMTP_PASSWORD` | Yes | `app_password_here` | SMTP password (app-specific for Gmail) |
+| `RESEND_API_KEY` | **Yes** | `re_abc123...` | **Resend API key (SMTP blocked on Railway)** |
+| `SMTP_FROM_EMAIL` | Yes | `noreply@yourdomain.com` | Email sender address (domain must be verified in Resend) |
 | `SECRET_KEY` | Yes | `random_32_char_string` | Flask/FastAPI secret key |
 | `JWT_SECRET_KEY` | Yes | `random_32_char_string` | JWT signing key |
 | `API_ENVIRONMENT` | No | `production` | Environment name |

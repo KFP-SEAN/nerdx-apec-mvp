@@ -1,0 +1,72 @@
+========================================================================
+🚨 URGENT: Railway Manual Redeploy Required
+========================================================================
+
+Current Issue:
+- Railway is still running OLD buggy code
+- All NBRS scores showing 15.17 (should be 99.25 for premium leads)
+- GitHub auto-deploy is NOT working
+
+Solution: Manual Redeploy via Railway Dashboard
+========================================================================
+
+STEP 1: Open Railway Dashboard
+--------------------------------
+URL: https://railway.app/project/53c2f700-32ca-491f-b525-8552114b6fd6
+
+STEP 2: Select Service
+--------------------------------
+Click on "warm-lead-generation" service
+
+STEP 3: Open Deployments Tab
+--------------------------------
+Click "Deployments" at the top
+
+STEP 4: Trigger Redeploy
+--------------------------------
+Option A: Click the "Redeploy" button (top right)
+Option B: Click "⋮" menu on latest deployment → "Redeploy"
+
+STEP 5: Wait for Deployment
+--------------------------------
+Watch logs until you see:
+- "Building..."
+- "Deploying..."
+- "SUCCESS" status
+- Should take 1-2 minutes
+
+STEP 6: Verify Fix (Run this command)
+--------------------------------
+curl -X POST "https://warm-lead-generation-production.up.railway.app/api/v1/lead-scoring/calculate" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"lead_id\":\"verify-fix\",\"company_name\":\"Test Corp\",\"brand_affinity\":{\"past_interaction_score\":95,\"email_engagement_score\":98,\"meeting_history_score\":92,\"relationship_duration_score\":95,\"contact_frequency_score\":94,\"decision_maker_access_score\":98,\"nps_score\":95,\"testimonial_provided\":true,\"reference_willing\":true},\"market_positioning\":{\"annual_revenue_krw\":500000000000,\"employee_count\":1000,\"marketing_budget_krw\":5000000000,\"target_industry_match\":true,\"target_geography_match\":true,\"pain_point_alignment_score\":95,\"revenue_growth_yoy\":50,\"expansion_plans_score\":95},\"digital_presence\":{\"website_traffic_monthly\":500000,\"social_media_followers\":100000,\"content_engagement_score\":95,\"modern_website\":true,\"marketing_automation\":true,\"mobile_app\":true,\"ecommerce_enabled\":true},\"update_salesforce\":false}"
+
+Expected Response:
+{
+  "nbrs_score": 99.25,   // ← Should be ~99, NOT 15.17!
+  "tier": "tier1",        // ← Should be tier1, NOT tier4!
+  ...
+}
+
+========================================================================
+Why Auto-Deploy Isn't Working:
+========================================================================
+
+Railway's GitHub integration may not be configured for automatic deployments.
+
+To enable auto-deploy for future updates:
+1. Go to Service Settings
+2. Under "Deploy" section
+3. Enable "Auto Deploy on Push"
+4. Save settings
+
+========================================================================
+Timeline:
+========================================================================
+
+✅ Code fixed and tested locally: 2025-10-26 13:00
+✅ Committed to GitHub: f2cfc90, 3627182, a0394a1, dc56b5d
+⏳ Railway manual redeploy: PENDING
+⏳ Production verification: PENDING
+
+========================================================================

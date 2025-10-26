@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NBRS_Tier__c</fullName>
+    <description>Lead tier classification (TIER1=Top, TIER4=Low)</description>
+    <externalId>false</externalId>
+    <label>NBRS Tier</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>TIER1</fullName>
+                <default>false</default>
+                <label>TIER1</label>
+            </value>
+            <value>
+                <fullName>TIER2</fullName>
+                <default>false</default>
+                <label>TIER2</label>
+            </value>
+            <value>
+                <fullName>TIER3</fullName>
+                <default>false</default>
+                <label>TIER3</label>
+            </value>
+            <value>
+                <fullName>TIER4</fullName>
+                <default>false</default>
+                <label>TIER4</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

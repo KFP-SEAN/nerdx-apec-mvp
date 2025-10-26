@@ -249,13 +249,20 @@ SALESFORCE_USERNAME=your_username@domain.com
 SALESFORCE_PASSWORD=your_password
 ODOO_URL=https://your-odoo.com
 DATABASE_URL=postgresql://user:pass@localhost:5432/nerdx_accounting
-SMTP_USERNAME=your_email@gmail.com
+
+# Email (Resend API - Railway Compatible)
+RESEND_API_KEY=re_your_resend_api_key
+SMTP_FROM_EMAIL=noreply@yourdomain.com
 
 # Optional
 REPORT_GENERATION_HOUR=6  # Daily report at 6 AM
 REPORT_TIMEZONE=Asia/Seoul
 DEFAULT_CURRENCY=KRW
 ```
+
+**📧 Email Configuration:**
+This system uses **Resend API** for email delivery, which is Railway-compatible (SMTP ports are blocked on Railway).
+See [RAILWAY_EMAIL_SETUP.md](./RAILWAY_EMAIL_SETUP.md) for detailed setup instructions.
 
 ---
 
@@ -319,7 +326,8 @@ docker run -p 8003:8003 \
 - [ ] PostgreSQL 데이터베이스 생성
 - [ ] Salesforce API 자격증명 확인
 - [ ] Odoo API 접근 권한 확인
-- [ ] SMTP 이메일 설정 테스트
+- [ ] **Resend API 설정 및 도메인 인증** (see [RAILWAY_EMAIL_SETUP.md](./RAILWAY_EMAIL_SETUP.md))
+- [ ] 이메일 전송 테스트 (`python test_email.py your_email@example.com`)
 - [ ] 일간 리포트 스케줄러 설정
 - [ ] 모니터링 대시보드 구성
 
@@ -362,7 +370,7 @@ docker run -p 8003:8003 \
 - **ORM**: SQLAlchemy 2.0+
 - **CRM**: Salesforce (simple-salesforce)
 - **ERP**: Odoo (XML-RPC)
-- **Email**: SMTP (smtplib)
+- **Email**: Resend API (Railway-compatible HTTP-based email)
 - **Cache**: Redis 5.0+ (optional)
 - **Testing**: pytest, httpx
 
