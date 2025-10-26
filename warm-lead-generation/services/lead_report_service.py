@@ -369,12 +369,12 @@ class LeadReportService:
             }
 
             email = resend.Emails.send(params)
-            print(f"✓ Lead report email sent to {to_email}")
+            print(f"[OK] Lead report email sent to {to_email}")
             print(f"  Email ID: {email.get('id')}")
             return True
 
         except Exception as e:
-            print(f"✗ Failed to send email: {e}")
+            print(f"[ERROR] Failed to send email: {e}")
             return False
 
     def generate_and_send_report(self, recipient_email: str) -> bool:
@@ -391,35 +391,35 @@ class LeadReportService:
         access_token = self.get_salesforce_access_token()
 
         if not access_token:
-            print("✗ Failed to authenticate with Salesforce")
+            print("[ERROR] Failed to authenticate with Salesforce")
             return False
 
-        print("✓ Authentication successful")
+        print("[OK] Authentication successful")
 
         # Step 2: Lead 데이터 조회
         print("\n[2/4] Fetching Lead data from Salesforce...")
         leads = self.get_all_leads(access_token)
 
         if not leads:
-            print("⚠ No leads found")
+            print("[WARN] No leads found")
             # 데이터가 없어도 리포트는 보냄
         else:
-            print(f"✓ Found {len(leads)} leads")
+            print(f"[OK] Found {len(leads)} leads")
 
         # Step 3: HTML 리포트 생성
         print("\n[3/4] Generating HTML report...")
         report_date = date.today()
         html_content = self.generate_html_report(leads, report_date)
-        print(f"✓ Report generated ({len(html_content)} characters)")
+        print(f"[OK] Report generated ({len(html_content)} characters)")
 
         # Step 4: 이메일 발송
         print("\n[4/4] Sending email report...")
-        subject = f"🎯 NERDX Lead 일일 리포트 - {report_date.strftime('%Y-%m-%d')}"
+        subject = f"NERDX Lead Daily Report - {report_date.strftime('%Y-%m-%d')}"
         success = self.send_email_via_resend(recipient_email, subject, html_content)
 
         if success:
             print("\n" + "="*60)
-            print("✓ LEAD REPORT SENT SUCCESSFULLY!")
+            print("[SUCCESS] LEAD REPORT SENT SUCCESSFULLY!")
             print("="*60)
             print(f"Total Leads: {len(leads)}")
             print(f"Tier 1: {len([l for l in leads if l.get('NBRS_Tier__c') == 'TIER1'])}")
@@ -427,7 +427,7 @@ class LeadReportService:
             print(f"Tier 3: {len([l for l in leads if l.get('NBRS_Tier__c') == 'TIER3'])}")
             print("="*60)
         else:
-            print("\n✗ Failed to send report")
+            print("\n[ERROR] Failed to send report")
 
         return success
 
