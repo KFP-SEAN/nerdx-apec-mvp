@@ -1,0 +1,14 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+# Cron job for daily reports at 6:00 AM KST (21:00 UTC previous day)
+[[deploy.cron]]
+schedule = "0 21 * * *"  # 21:00 UTC = 06:00 KST next day
+command = "python daily_report_cron.py"

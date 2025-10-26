@@ -11,8 +11,9 @@ import io
 # Fix Windows console encoding
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-# TODO: Get access token from Salesforce CLI: sf org display --target-org nerdx-org --json
-ACCESS_TOKEN = "YOUR_ACCESS_TOKEN_HERE"  # Replace with actual token from sf org display
+# Access token from Salesforce CLI: sf org display --target-org nerdx-org --json
+# TODO: Get from Salesforce CLI - this is a test script only
+ACCESS_TOKEN = "YOUR_ACCESS_TOKEN_HERE"  # Replace with actual token
 INSTANCE_URL = "https://innovation-innovation-8209.my.salesforce.com"
 
 headers = {
