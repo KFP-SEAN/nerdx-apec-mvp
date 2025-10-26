@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="NERDX Warm Lead Generation System",
     description="NERD12 웜리드 발굴 시스템 - NBRS 기반 리드 스코어링",
-    version="1.0.0"
+    version="1.1.0-lead-report"
 )
 
 # Add CORS middleware
@@ -43,8 +43,9 @@ async def root():
     """Root endpoint"""
     return {
         "service": "NERDX Warm Lead Generation System",
-        "version": "1.0.0",
-        "status": "running"
+        "version": "1.1.0-lead-report",
+        "status": "running",
+        "lead_report_enabled": True
     }
 
 
