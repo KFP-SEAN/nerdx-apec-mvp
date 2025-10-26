@@ -50,4 +50,8 @@ async def send_lead_report(
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        error_detail = f"{type(e).__name__}: {str(e)}"
+        print(f"[ERROR] Lead report failed: {error_detail}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=error_detail)
