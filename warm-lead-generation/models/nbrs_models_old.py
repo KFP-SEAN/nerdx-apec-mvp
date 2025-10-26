@@ -1,6 +1,6 @@
 """
-NBRS (NERD Brand Resonance Score) Data Models - FIXED FOR KRW
-브랜드 공명 스코어 데이터 모델 - KRW 기준으로 수정됨
+NBRS (NERD Brand Resonance Score) Data Models
+브랜드 공명 스코어 데이터 모델
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -22,17 +22,17 @@ class BrandAffinityScore(BaseModel):
     Measures past interactions and relationship strength
     """
     # Past Interaction Score (15%)
-    past_interaction_score: float = Field(0.0, ge=0, le=100, description="과거 상호작용 점수")
+    salesforce_activity_score: float = Field(0.0, ge=0, le=100, description="Salesforce 활동 이력 점수")
     email_engagement_score: float = Field(0.0, ge=0, le=100, description="이메일 인게이지먼트 점수")
     meeting_history_score: float = Field(0.0, ge=0, le=100, description="미팅 이력 점수")
 
     # Relationship Depth (15%)
-    relationship_duration_score: float = Field(0.0, ge=0, le=100, description="관계 지속 기간 점수")
+    relationship_duration_months: int = Field(0, ge=0, description="관계 지속 기간 (개월)")
     contact_frequency_score: float = Field(0.0, ge=0, le=100, description="접촉 빈도 점수")
-    decision_maker_access_score: float = Field(0.0, ge=0, le=100, description="의사결정권자 접근 점수")
+    decision_maker_access: bool = Field(False, description="의사결정권자 접근 가능 여부")
 
     # Brand Perception (10%)
-    nps_score: float = Field(0.0, ge=0, le=100, description="Net Promoter Score (0-100 normalized)")
+    nps_score: Optional[int] = Field(None, ge=-100, le=100, description="Net Promoter Score")
     testimonial_provided: bool = Field(False, description="추천사 제공 여부")
     reference_willing: bool = Field(False, description="레퍼런스 제공 의향")
 
@@ -40,23 +40,26 @@ class BrandAffinityScore(BaseModel):
         """Calculate total brand affinity score (0-100)"""
         # Past Interaction (15%)
         past_interaction = (
-            self.past_interaction_score * 0.05 +
+            self.salesforce_activity_score * 0.05 +
             self.email_engagement_score * 0.05 +
             self.meeting_history_score * 0.05
         )
 
         # Relationship Depth (15%)
+        duration_score = min(self.relationship_duration_months / 12 * 100, 100)
+        decision_maker_bonus = 20 if self.decision_maker_access else 0
         relationship_depth = (
-            self.relationship_duration_score * 0.05 +
+            duration_score * 0.05 +
             self.contact_frequency_score * 0.05 +
-            self.decision_maker_access_score * 0.05
+            decision_maker_bonus * 0.05
         )
 
         # Brand Perception (10%)
+        nps_normalized = ((self.nps_score or 0) + 100) / 2  # Convert -100~100 to 0~100
         testimonial_bonus = 30 if self.testimonial_provided else 0
         reference_bonus = 30 if self.reference_willing else 0
         brand_perception = (
-            self.nps_score * 0.05 +
+            nps_normalized * 0.05 +
             testimonial_bonus * 0.025 +
             reference_bonus * 0.025
         )
@@ -68,32 +71,27 @@ class MarketPositioningScore(BaseModel):
     """
     Market Positioning - 시장 포지셔닝 (35%)
     Measures company size, budget, and strategic alignment
-    UPDATED: Uses KRW for Korean market
     """
-    # Company Size & Budget (20%) - KRW 기준
-    annual_revenue_krw: Optional[int] = Field(None, ge=0, description="연 매출 (KRW)")
+    # Company Size & Budget (20%)
+    annual_revenue_usd: Optional[int] = Field(None, ge=0, description="연 매출 (USD)")
     employee_count: Optional[int] = Field(None, ge=0, description="직원 수")
-    marketing_budget_krw: Optional[int] = Field(None, ge=0, description="마케팅 예산 (KRW)")
+    marketing_budget_usd: Optional[int] = Field(None, ge=0, description="마케팅 예산 (USD)")
 
     # Strategic Alignment (10%)
     target_industry_match: bool = Field(False, description="타겟 산업 일치 여부")
     target_geography_match: bool = Field(False, description="타겟 지역 일치 여부")
-    pain_point_alignment_score: float = Field(0.0, ge=0, le=100, description="Pain Point 일치도")
+    pain_point_alignment: float = Field(0.0, ge=0, le=100, description="Pain Point 일치도")
 
     # Growth Potential (5%)
-    revenue_growth_yoy: float = Field(0.0, description="YoY 매출 성장률 (%)")
-    expansion_plans_score: float = Field(0.0, ge=0, le=100, description="확장 계획 점수")
+    revenue_growth_yoy_percent: Optional[float] = Field(None, description="YoY 매출 성장률 (%)")
+    expansion_plans: bool = Field(False, description="확장 계획 유무")
 
     def calculate_total(self) -> float:
         """Calculate total market positioning score (0-100)"""
-        # Company Size & Budget (20%) - KRW 스케일링
-        # 1000억원 = 100점, 100억원 = 10점
-        revenue_score = min((self.annual_revenue_krw or 0) / 1_000_000_000_000 * 100, 100)
-        # 1000명 = 100점
+        # Company Size & Budget (20%)
+        revenue_score = min((self.annual_revenue_usd or 0) / 10_000_000 * 100, 100)
         employee_score = min((self.employee_count or 0) / 1000 * 100, 100)
-        # 100억원 = 100점
-        budget_score = min((self.marketing_budget_krw or 0) / 10_000_000_000 * 100, 100)
-
+        budget_score = min((self.marketing_budget_usd or 0) / 1_000_000 * 100, 100)
         company_size_budget = (
             revenue_score * 0.10 +
             employee_score * 0.05 +
@@ -106,14 +104,15 @@ class MarketPositioningScore(BaseModel):
         strategic_alignment = (
             industry_bonus * 0.04 +
             geography_bonus * 0.03 +
-            self.pain_point_alignment_score * 0.03
+            self.pain_point_alignment * 0.03
         )
 
         # Growth Potential (5%)
-        growth_score = min(self.revenue_growth_yoy / 50 * 100, 100)
+        growth_score = min((self.revenue_growth_yoy_percent or 0) / 50 * 100, 100)
+        expansion_bonus = 50 if self.expansion_plans else 0
         growth_potential = (
             growth_score * 0.025 +
-            self.expansion_plans_score * 0.025
+            expansion_bonus * 0.025
         )
 
         return company_size_budget + strategic_alignment + growth_potential
@@ -130,9 +129,9 @@ class DigitalPresenceScore(BaseModel):
     content_engagement_score: float = Field(0.0, ge=0, le=100, description="콘텐츠 인게이지먼트 점수")
 
     # Digital Maturity (10%)
-    modern_website: bool = Field(False, description="현대적 웹사이트 보유")
-    marketing_automation: bool = Field(False, description="마케팅 자동화 도구 사용")
-    mobile_app: bool = Field(False, description="모바일 앱 보유")
+    has_modern_website: bool = Field(False, description="현대적 웹사이트 보유")
+    uses_marketing_automation: bool = Field(False, description="마케팅 자동화 도구 사용")
+    has_mobile_app: bool = Field(False, description="모바일 앱 보유")
     ecommerce_enabled: bool = Field(False, description="이커머스 기능 보유")
 
     def calculate_total(self) -> float:
@@ -148,9 +147,9 @@ class DigitalPresenceScore(BaseModel):
 
         # Digital Maturity (10%)
         maturity_score = sum([
-            25 if self.modern_website else 0,
-            25 if self.marketing_automation else 0,
-            25 if self.mobile_app else 0,
+            25 if self.has_modern_website else 0,
+            25 if self.uses_marketing_automation else 0,
+            25 if self.has_mobile_app else 0,
             25 if self.ecommerce_enabled else 0
         ])
         digital_maturity = maturity_score * 0.10
@@ -242,14 +241,14 @@ class LeadEnrichmentResult(BaseModel):
     lead_id: str
     company_name: str
 
-    # Enriched data - KRW 기준
-    annual_revenue_krw: Optional[int] = None
+    # Enriched data
+    annual_revenue_usd: Optional[int] = None
     employee_count: Optional[int] = None
     industry: Optional[str] = None
     tech_stack: List[str] = []
     social_media_followers: Optional[int] = None
     website_traffic_monthly: Optional[int] = None
-    funding_total_krw: Optional[int] = None
+    funding_total_usd: Optional[int] = None
 
     # Metadata
     enriched_at: datetime = Field(default_factory=datetime.utcnow)
