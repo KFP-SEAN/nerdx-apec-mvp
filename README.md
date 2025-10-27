@@ -31,7 +31,7 @@ NERDX APEC MVP는 AI 기반 "공명 경제(Resonance Economy)" 플랫폼으로, 
 │  System             (NBRS 1.0)         (NBRS 2.0)       │
 │                                                         │
 │  Port: 8003         Port: 8004         Port: 8005       │
-│  ✅ Production      ✅ Production      🔄 Ready         │
+│  ✅ Production      ✅ Production      ✅ Production    │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -58,9 +58,9 @@ NERDX APEC MVP는 AI 기반 "공명 경제(Resonance Economy)" 플랫폼으로, 
 ### System 3: Project Sonar (NBRS 2.0)
 **Purpose**: AI-powered brand resonance analysis → Resonance Economy vision
 
-- **Status**: 🔄 Ready for Railway Deployment
+- **Status**: ✅ Production
 - **Port**: 8005
-- **Local**: http://localhost:8005
+- **URL**: https://project-sonar-production-production.up.railway.app
 - **Docs**: [project-sonar/README.md](./project-sonar/README.md)
 
 ---
